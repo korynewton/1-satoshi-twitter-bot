@@ -1,14 +1,16 @@
-# @1satoshibot 
+# @1satoshibot
 import requests
 import random
 import tweepy as tp
 import time
+from settings import *
+
 
 #twitter credentials
-consumer_key = ''
-consumer_secret = ''
-access_token = ''
-access_secret = ''
+consumer_key = CONSUMER_KEY
+consumer_secret = CONSUMER_SECRET
+access_token = ACCESS_TOKEN
+access_secret = ACCESS_SECRET
 
 #login to twitter
 auth = tp.OAuthHandler(consumer_key, consumer_secret)
@@ -90,9 +92,6 @@ rates_data = {}
 random_select = {}
 
 
-
-
-
 # grab fixer.io price data, convert it to pps and pick 12 symbols at random
 rates_data = {}
 def fixer():
@@ -143,6 +142,3 @@ def tweet():
     fixer()
 
 fixer()
-
-
-

@@ -65,6 +65,7 @@ def getData():
 
 
 def compose(randomly_selected):
+    hashtag = ['#Bitcoin', '#StackingSats']
     to_be_tweeted = ''
     print(randomly_selected)
     # global to_be_tweeted
@@ -79,9 +80,11 @@ def compose(randomly_selected):
             odd_line = '   ' + emoji + ': ' + str(price) + ' ' + key
             to_be_tweeted = to_be_tweeted + odd_line
         i += 1
-    to_be_tweeted = to_be_tweeted + '\n' + '                       #Bitcoin'
+
+    to_be_tweeted = to_be_tweeted + '\n' + \
+        '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
-    tweet(to_be_tweeted)
+    # tweet(to_be_tweeted)
 
 
 # tweet

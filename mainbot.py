@@ -84,7 +84,7 @@ def compose(randomly_selected):
     to_be_tweeted = to_be_tweeted + '\n' + \
         '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
-    # tweet(to_be_tweeted)
+    tweet(to_be_tweeted)
 
 
 # tweet

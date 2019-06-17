@@ -93,8 +93,7 @@ def compose(randomly_selected):
             to_be_tweeted += '   ' + emoji + \
                 ': ' + str(price) + ' ' + key + '\n'
 
-    to_be_tweeted = to_be_tweeted + \
-        '                       ' + random.choice(hashtag)
+    to_be_tweeted += '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
     tweet(to_be_tweeted)
 

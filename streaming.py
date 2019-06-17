@@ -1,5 +1,6 @@
 import tweepy as tp
 from settings import *
+import pickle
 
 
 # twitter credentials
@@ -9,8 +10,12 @@ access_token = ACCESS_TOKEN
 access_secret = ACCESS_SECRET
 fixer_key = FIXER_KEY
 
-# override tweepy.StreamListener to add logic to on_status
+# import current price data from file
+pickle_in = open('price_data.txt', 'rb')
+price_data = pickle.load(pickle_in)
 
+
+# override tweepy.StreamListener to add logic to on_status
 
 class MyStreamListener(tp.StreamListener):
 
@@ -19,7 +24,11 @@ class MyStreamListener(tp.StreamListener):
         self.compose(status)
 
     def compose(self, status):
-        pass
+        split = status.text.split()
+        currency = [i for i in split if len(i) == 3]
+        for item in currency:
+            if item in price_data:
+                print(currency)
 
 
 auth = tp.OAuthHandler(consumer_key, consumer_secret)
@@ -30,7 +39,7 @@ myStreamListener = MyStreamListener()
 myStream = tp.Stream(auth=api.auth, listener=myStreamListener)
 
 
-myStream.filter(track=['@1satoshibot'], is_async=True)
+myStream.filter(track=['bitcoin'], is_async=True)
 
 # my user id
 # myStream.filter(follow=["1035658046515466240"])

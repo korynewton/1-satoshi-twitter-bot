@@ -59,7 +59,7 @@ def getData():
         data_file.write(repr(rates_data))
         data_file.close()
 
-        print(rates_data)
+        # print(rates_data)
 
     except:
         print('request failed')
@@ -70,29 +70,30 @@ def getData():
         rates_data[key] = float(rates_data[key])
 
     # Select currencies at random
-    random_select = random.sample(symbol_key, 12)
+    random_select = random.sample(symbol_key, 13)
 
     compose(random_select)
 
 
 def compose(randomly_selected):
     hashtag = ['#Bitcoin', '#StackingSats']
-    to_be_tweeted = ''
+    to_be_tweeted = '1 #satoshi =        '
     print(randomly_selected)
-    # global to_be_tweeted
     for i in range(len(randomly_selected)):
         key = randomly_selected[i]
         emoji = emoji_dict[key]
         price = '{0:.5f}'.format(rates_data[key])
 
-        if i % 2 == 0:
-            even_line = emoji + ': ' + str(price) + ' ' + key
-            to_be_tweeted = to_be_tweeted + even_line
-        else:
-            odd_line = '   ' + emoji + ': ' + str(price) + ' ' + key + '\n'
-            to_be_tweeted = to_be_tweeted + odd_line
+        if i == 0:
+            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key + '\n'
 
-    to_be_tweeted = to_be_tweeted + '\n' + \
+        elif i % 2 != 0:
+            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key
+        else:
+            to_be_tweeted += '   ' + emoji + \
+                ': ' + str(price) + ' ' + key + '\n'
+
+    to_be_tweeted = to_be_tweeted + \
         '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
     tweet(to_be_tweeted)

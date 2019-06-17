@@ -28,19 +28,23 @@ rates_data = {}
 
 
 def getData():
-    random_select = {}
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
         fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP'
     url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
     try:
+        # retrieve data from coinbase and fixer apis
         cb_json_data = requests.get(url).json()['data']['rates']
         fixer_json_data = requests.get(fixer_url).json()['rates']
 
+        print(cb_json_data)
+
+        # from cb data, store data there are emojis for in rates_data, convert to sats
         for key in emoji_dict:
             if key in cb_json_data:
                 price_sats = float(cb_json_data[key])
                 rates_data[key] = str(price_sats / 100000000)
 
+        # for fixer data, get conversion based on EUR/BTC pair, multiply fixer currency with conversion rate
         EUR = fixer_json_data['EUR']
         BTC = fixer_json_data['BTC']
         bitprice = (EUR / BTC)
@@ -50,38 +54,46 @@ def getData():
             if not key == 'BTC' and not key == 'EUR':
                 rates_data[key] = str(fixer_json_data[key])
 
-        print(rates_data)
+        # write data to file for access from other threads
+        data_file = open('data_file.txt', 'w')
+        data_file.write(repr(rates_data))
+        data_file.close()
+
+        # print(rates_data)
 
     except:
         print('request failed')
+        time.sleep(1000)
+        getData()
 
     for key in rates_data:
         rates_data[key] = float(rates_data[key])
 
-    # print(rates_data)
-    random_select = random.sample(symbol_key, 12)
+    # Select currencies at random
+    random_select = random.sample(symbol_key, 13)
 
     compose(random_select)
 
 
 def compose(randomly_selected):
     hashtag = ['#Bitcoin', '#StackingSats']
-    to_be_tweeted = ''
+    to_be_tweeted = '1 #satoshi =        '
     print(randomly_selected)
-    # global to_be_tweeted
     for i in range(len(randomly_selected)):
         key = randomly_selected[i]
         emoji = emoji_dict[key]
         price = '{0:.5f}'.format(rates_data[key])
-        if i % 2 == 0:
-            even_line = '\n' + emoji + ': ' + str(price) + ' ' + key
-            to_be_tweeted = to_be_tweeted + even_line
-        else:
-            odd_line = '   ' + emoji + ': ' + str(price) + ' ' + key
-            to_be_tweeted = to_be_tweeted + odd_line
-        i += 1
 
-    to_be_tweeted = to_be_tweeted + '\n' + \
+        if i == 0:
+            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key + '\n'
+
+        elif i % 2 != 0:
+            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key
+        else:
+            to_be_tweeted += '   ' + emoji + \
+                ': ' + str(price) + ' ' + key + '\n'
+
+    to_be_tweeted = to_be_tweeted + \
         '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
     tweet(to_be_tweeted)

@@ -5,6 +5,7 @@ import tweepy as tp
 import time
 from settings import *
 from emoji_dict import *
+import pickle
 
 
 # twitter credentials
@@ -55,9 +56,12 @@ def getData():
                 rates_data[key] = str(fixer_json_data[key])
 
         # write data to file for access from other threads
-        data_file = open('data_file.txt', 'w')
-        data_file.write(repr(rates_data))
-        data_file.close()
+        # data_file = open('price_data.txt', 'w')
+        # data_file.write(repr(rates_data))
+        # data_file.close()
+        pickle_out = open('price_data.txt', 'wb')
+        pickle.dump(rates_data, pickle_out)
+        pickle_out.close()
 
         # print(rates_data)
 
@@ -95,7 +99,7 @@ def compose(randomly_selected):
 
     to_be_tweeted += '                       ' + random.choice(hashtag)
     print(to_be_tweeted)
-    tweet(to_be_tweeted)
+    # tweet(to_be_tweeted)
 
 
 # tweet

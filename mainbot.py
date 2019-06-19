@@ -76,7 +76,6 @@ def getData():
 
 
 def compose(randomly_selected):
-    hashtag = ['#Bitcoin', '#StackingSats']
     to_be_tweeted = '1 #satoshi =        '
     print(randomly_selected)
     for i in range(len(randomly_selected)):
@@ -85,16 +84,17 @@ def compose(randomly_selected):
         price = '{0:.5f}'.format(rates_data[key])
 
         if i == 0:
-            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key + '\n'
+            to_be_tweeted += str(price) + ' $' + key + ' ' + emoji + '\n'
 
         elif i % 2 != 0:
-            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key
+            to_be_tweeted += str(price) + ' $' + key + ' ' + emoji
+
         else:
-            to_be_tweeted += '   ' + emoji + \
-                ': ' + str(price) + ' ' + key + '\n'
+            to_be_tweeted += '   ' + \
+                str(price) + ' $' + key + ' ' + emoji + '\n'
 
     to_be_tweeted = to_be_tweeted + \
-        '                       ' + random.choice(hashtag)
+        '            ' + '#Bitcoin #StackingSats'
     print(to_be_tweeted)
     tweet(to_be_tweeted)
 

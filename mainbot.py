@@ -70,9 +70,7 @@ def getData():
         rates_data[key] = float(rates_data[key])
 
     # Select currencies at random
-    # random_select = random.sample(symbol_key, 13)
-    random_select = ['HRK', 'PKR', 'CRC', 'TRY', 'DJF', 'WST',
-                     'PLN', 'AED', 'BND', 'MWK', 'PAB', 'IRR', 'INR']
+    random_select = random.sample(symbol_key, 13)
 
     compose(random_select)
 

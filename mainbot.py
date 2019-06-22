@@ -29,7 +29,7 @@ rates_data = {}
 
 def getData():
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
-        fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP'
+        fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'
     url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
     try:
         # retrieve data from coinbase and fixer apis
@@ -70,7 +70,9 @@ def getData():
         rates_data[key] = float(rates_data[key])
 
     # Select currencies at random
-    random_select = random.sample(symbol_key, 13)
+    # random_select = random.sample(symbol_key, 13)
+    random_select = ['HRK', 'PKR', 'CRC', 'TRY', 'DJF', 'WST',
+                     'PLN', 'AED', 'BND', 'MWK', 'PAB', 'IRR', 'INR']
 
     compose(random_select)
 

@@ -22,7 +22,7 @@ api = tp.API(auth)
 
 
 symbol_key = ['GBP', 'JPY', 'EUR', 'USD', 'KZT', 'AUD', 'CAD', 'INR', 'RUB', 'TRY', 'VES', 'ZWL', 'MXN', 'ARS', 'AOA', 'BRL', 'ZAR', 'LRD', 'LYD', 'LSL', 'NAD', 'SZL', 'TND', 'MMK', 'SEK', 'PKR', 'NPR', 'BTN', 'AED', 'AFN', 'ALL', 'AMD', 'AOA', 'BDT', 'AWG', 'AZN', 'BAM', 'BBD', 'BGN', 'BHD', 'BIF', 'BND', 'BOB', 'BSD', 'BMD', 'BWP', 'BYN', 'BZD', 'XAF', 'CDF', 'CHF', 'CLP', 'CNY', 'COP', 'CRC', 'CVE', 'CZK', 'DJF', 'DKK', 'DOP', 'DZD', 'EGP', 'ERN', 'ETB', 'FJD', 'FKP', 'GEL', 'GGP', 'GHS', 'GIP', 'GNF', 'GTQ', 'GYD',
-              'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 'ILS', 'IQD', 'ISK', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 'KHR', 'KMF', 'KRW', 'KWD', 'KYD', 'LAK', 'LBP', 'LKR', 'MAD', 'MDL', 'MGA', 'MKD', 'MNT', 'MOP', 'MRO', 'MUR', 'MVR', 'MWK', 'MYR', 'MZN', 'NAD', 'NGN', 'NIO', 'NOK', 'NZD', 'OMR', 'PAB', 'PEN', 'PGK', 'PHP', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RWF', 'SAR', 'SBD', 'SCR', 'SLL', 'SOS', 'SRD', 'STD', 'SVC', 'THB', 'TJS', 'TMT', 'TND', 'TOP', 'TTD', 'TWD', 'TZS', 'UAH', 'UGX', 'UYU', 'UZS', 'VND', 'VUV', 'WST', 'YER', 'ZMW', 'CUP', 'KPW', 'SYP', 'SDG']
+              'HKD', 'HNL', 'HRK', 'HTG', 'HUF', 'IDR', 'ILS', 'IQD', 'ISK', 'JMD', 'JOD', 'JPY', 'KES', 'KGS', 'KHR', 'KMF', 'KRW', 'KWD', 'KYD', 'LAK', 'LBP', 'LKR', 'MAD', 'MDL', 'MGA', 'MKD', 'MNT', 'MOP', 'MRO', 'MUR', 'MVR', 'MWK', 'MYR', 'MZN', 'NAD', 'NGN', 'NIO', 'NOK', 'NZD', 'OMR', 'PAB', 'PEN', 'PGK', 'PHP', 'PLN', 'PYG', 'QAR', 'RON', 'RSD', 'RWF', 'SAR', 'SBD', 'SCR', 'SLL', 'SOS', 'SRD', 'STD', 'SVC', 'THB', 'TJS', 'TMT', 'TND', 'TOP', 'TTD', 'TWD', 'TZS', 'UAH', 'UGX', 'UYU', 'UZS', 'VND', 'VUV', 'WST', 'YER', 'ZMW', 'CUP', 'KPW', 'SYP', 'SDG', 'IRR']
 
 
 rates_data = {}
@@ -30,7 +30,7 @@ rates_data = {}
 
 def getData():
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
-        fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP'
+        fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'
     url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
     try:
         # retrieve data from coinbase and fixer apis
@@ -80,7 +80,6 @@ def getData():
 
 
 def compose(randomly_selected):
-    hashtag = ['#Bitcoin', '#StackingSats']
     to_be_tweeted = '1 #satoshi =        '
     print(randomly_selected)
     for i in range(len(randomly_selected)):
@@ -89,15 +88,17 @@ def compose(randomly_selected):
         price = '{0:.5f}'.format(rates_data[key])
 
         if i == 0:
-            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key + '\n'
+            to_be_tweeted += str(price) + ' $' + key + ' ' + emoji + '\n'
 
         elif i % 2 != 0:
-            to_be_tweeted += emoji + ': ' + str(price) + ' ' + key
-        else:
-            to_be_tweeted += '   ' + emoji + \
-                ': ' + str(price) + ' ' + key + '\n'
+            to_be_tweeted += str(price) + ' $' + key + ' ' + emoji
 
-    to_be_tweeted += '                       ' + random.choice(hashtag)
+        else:
+            to_be_tweeted += '   ' + \
+                str(price) + ' $' + key + ' ' + emoji + '\n'
+
+    to_be_tweeted = to_be_tweeted + \
+        '            ' + '#Bitcoin #StackingSats'
     print(to_be_tweeted)
     # tweet(to_be_tweeted)
 

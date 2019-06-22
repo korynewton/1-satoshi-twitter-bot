@@ -21,14 +21,14 @@ class MyStreamListener(tp.StreamListener):
 
     def on_status(self, status):
         print(status.text)
-        self.compose(status)
-
-    def compose(self, status):
+        # filter
         split = status.text.split()
         currency = [i for i in split if len(i) == 3]
         for item in currency:
             if item in price_data:
-                print(currency)
+                self.compose(status)
+
+    def compose(self, status):
 
 
 auth = tp.OAuthHandler(consumer_key, consumer_secret)

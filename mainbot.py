@@ -55,10 +55,6 @@ def getData():
             if not key == 'BTC' and not key == 'EUR':
                 rates_data[key] = str(fixer_json_data[key])
 
-        # write data to file for access from other threads
-        # data_file = open('price_data.txt', 'w')
-        # data_file.write(repr(rates_data))
-        # data_file.close()
         pickle_out = open('price_data.txt', 'wb')
         pickle.dump(rates_data, pickle_out)
         pickle_out.close()

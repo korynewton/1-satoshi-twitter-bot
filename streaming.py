@@ -30,13 +30,14 @@ class MyStreamListener(tp.StreamListener):
                 self.compose(status, item)
 
     def compose(self, status, curr):
-        larger_baseline = ['JPY', 'INR']
+        larger_baseline = ['JPY', 'INR', 'KRW']
 
         emoji = emoji_dict[curr]
 
         sats = float(price_data[curr])
         hundred = sats * 100
         thousand = sats * 1000
+        ten_thousand = sats * 10000
         hundred_k = sats * 100000
         million = sats * 1000000
         bitcoin = sats * 100000000
@@ -66,12 +67,14 @@ class MyStreamListener(tp.StreamListener):
             hundred = '{0:.5f}'.format(hundred)
 
         if thousand > 1:
-            if thousand > 1000:
-                thousand = '{0:,}'.format(round(thousand))
-            else:
-                thousand = '{0:,}'.format(round(thousand))
+            thousand = '{0:,.2f}'.format(thousand)
         else:
             thousand = '{0:.5f}'.format(thousand)
+
+        if ten_thousand > 1:
+            ten_thousand = '{0:,.2f}'.format(ten_thousand)
+        else:
+            ten_thousand = '{0:.5f}'.format(ten_thousand)
 
         if hundred_k > 1:
             hundred_k = '{0:,.2f}'.format(hundred_k)
@@ -133,7 +136,7 @@ class MyStreamListener(tp.StreamListener):
         if curr in larger_baseline:
             text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
                 '\n' + f'   1 {curr} = {single_unit} sats' + \
-                '\n' + f'   500 {curr} = {five_hundred_units} sats' + \
+                '\n' + f'   1,000 {curr} = {thousand_units} sats' + \
                 '\n' + f'   10,000 {curr} = {ten_thousand_units} sats' + \
                 '\n' + f'   100,000 {curr} = {hundred_thousand_units} sats' + \
                 '\n' + '\n' + \
@@ -152,7 +155,7 @@ class MyStreamListener(tp.StreamListener):
                 '\n' + '\n' + \
                 '\n' + f'   1 sat = {sats} {curr}' + \
                 '\n' + f'   100 sats = {hundred} {curr}' + \
-                '\n' + f'   1,000 sats = {thousand} {curr}' + \
+                '\n' + f'   10,000 sats = {ten_thousand} {curr}' + \
                 '\n' + f'   1,000,000 sats = {million} {curr}' + \
                 '\n' + '\n' + \
                 f'1 #bitcoin = {bitcoin} {curr} {emoji}'
@@ -160,10 +163,9 @@ class MyStreamListener(tp.StreamListener):
         print(text)
         print('length:', len(text))
 
-        # self.tweet_it(text, status.id)
+        self.tweet_it(text, status.id)
 
     def tweet_it(self, text, reply_id):
-        # reply_id = str(reply_id)
         api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
         # api.update_status(status,)
@@ -179,4 +181,4 @@ myStreamListener = MyStreamListener()
 myStream = tp.Stream(auth=api.auth, listener=myStreamListener)
 
 
-myStream.filter(track=['USD'], is_async=True)
+myStream.filter(track=['@1satoshibot'], is_async=True)

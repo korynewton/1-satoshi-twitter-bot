@@ -11,13 +11,6 @@ access_token = ACCESS_TOKEN
 access_secret = ACCESS_SECRET
 fixer_key = FIXER_KEY
 
-# import current price data from file
-pickle_in = open('price_data.txt', 'rb')
-price_data = pickle.load(pickle_in)
-
-
-# override tweepy.StreamListener to add logic to on_status
-
 
 class MyStreamListener(tp.StreamListener):
     def __init__(self):
@@ -25,6 +18,8 @@ class MyStreamListener(tp.StreamListener):
         self.auth = tp.OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.api = tp.API(self.auth)
+        self.pickle_in = open('price_data.txt', 'rb')
+        self.price_data = pickle.load(self.pickle_in)
 
     def on_status(self, status):
         print(status.text)
@@ -32,7 +27,7 @@ class MyStreamListener(tp.StreamListener):
         split = status.text.split()
         currency = [i.upper() for i in split if len(i) == 3]
         for item in currency:
-            if item in price_data:
+            if item in self.price_data:
                 self.compose(status, item)
 
     def on_error(self, status):
@@ -55,7 +50,7 @@ class MyStreamListener(tp.StreamListener):
 
         emoji = emoji_dict[curr]
 
-        sats = float(price_data[curr])
+        sats = float(self.price_data[curr])
         hundred = sats * 100
         thousand = sats * 1000
         ten_thousand = sats * 10000
@@ -190,21 +185,3 @@ class MyStreamListener(tp.StreamListener):
         self.api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
         print('tweeted')
-
-
-# if __name__ == '__main__':
-
-#     # authentication
-#     auth = tp.OAuthHandler(consumer_key, consumer_secret)
-#     auth.set_access_token(access_token, access_secret)
-#     api = tp.API(auth)
-
-    # myStreamListener = MyStreamListener()
-    # myStream = tp.Stream(auth=api.auth, listener=myStreamListener)
-    # myStream.filter(track=['seattle'], is_async=True)
-
-    # while True:
-    #     time.sleep(5)
-    #     print('waited 5 seconds')
-
-#     print('slept for 10 seconds')

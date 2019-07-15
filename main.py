@@ -3,7 +3,8 @@ import time
 
 from settings import *
 from streaming import MyStreamListener
-from scheduled_tweet import (getData, compose, tweet)
+from scheduled_tweet import ScheduledTweet
+from data import Retrieve_Data
 
 
 # twitter credentials
@@ -15,14 +16,17 @@ fixer_key = FIXER_KEY
 
 
 if __name__ == "__main__":
-    # Initialize stream
+    # Get data, store in price_data.txt
+    Retrieve_Data()
+
+    # Initialize stream to listen for mentions
     myStreamListener = MyStreamListener()
     myStream = tp.Stream(auth=myStreamListener.api.auth,
                          listener=myStreamListener)
     myStream.filter(track=['1satoshibot'], is_async=True)
 
     while True:
-        getData()
+        ScheduledTweet()
         wait = 30 * 60
         time.sleep(wait)
         print(f'waited {wait} seconds')

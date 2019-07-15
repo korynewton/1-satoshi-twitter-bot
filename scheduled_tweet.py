@@ -103,8 +103,8 @@ def compose(randomly_selected):
 def tweet(tweet_text):
     api.update_status(tweet_text)
     print('tweeted')
-    time.sleep(5400)
-    getData()
+    # time.sleep(5400)
+    # getData()
 
 
-getData()
+# getData()

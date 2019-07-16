@@ -18,16 +18,16 @@ class MyStreamListener(tp.StreamListener):
         self.auth = tp.OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.api = tp.API(self.auth)
-        self.pickle_in = open('price_data.txt', 'rb')
-        self.price_data = pickle.load(self.pickle_in)
 
     def on_status(self, status):
         print(status.text)
+        pickle_in = open('price_data.txt', 'rb')
+        price_data = pickle.load(pickle_in)
         # filter
         split = status.text.split()
         currency = [i.upper() for i in split if len(i) == 3]
         for item in currency:
-            if item in self.price_data:
+            if item in price_data:
                 self.compose(status, item)
 
     def on_error(self, status):
@@ -46,11 +46,14 @@ class MyStreamListener(tp.StreamListener):
         return
 
     def compose(self, status, curr):
+        pickle_in = open('price_data.txt', 'rb')
+        price_data = pickle.load(pickle_in)
+
         larger_baseline = ['JPY', 'INR', 'KRW']
 
         emoji = emoji_dict[curr]
 
-        sats = float(self.price_data[curr])
+        sats = float(price_data[curr])
         hundred = sats * 100
         thousand = sats * 1000
         ten_thousand = sats * 10000

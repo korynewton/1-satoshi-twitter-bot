@@ -1,5 +1,6 @@
 import tweepy as tp
 import time
+import random
 
 from settings import *
 from streaming import MyStreamListener
@@ -26,7 +27,8 @@ if __name__ == "__main__":
     myStream.filter(track=['1satoshibot'], is_async=True)
 
     while True:
+        Retrieve_Data()
         ScheduledTweet()
-        wait = 30 * 60
+        wait = 50 * 60 + (random.randint(1, 30) * 60)
         time.sleep(wait)
         print(f'waited {wait} seconds')

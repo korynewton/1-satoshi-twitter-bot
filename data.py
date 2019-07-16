@@ -24,7 +24,8 @@ class Retrieve_Data():
             cb_json_data = requests.get(url).json()['data']['rates']
             fixer_json_data = requests.get(fixer_url).json()['rates']
 
-            print(cb_json_data)
+            # print(cb_json_data)
+            print('USD:', cb_json_data['USD'])
 
             # from cb data, store data there are emojis for in rates_data, convert to sats
             for key in emoji_dict:
@@ -55,6 +56,3 @@ class Retrieve_Data():
             print('request failed')
             time.sleep(1000)
             self.get_data()
-
-        for key in rates_data:
-            rates_data[key] = float(rates_data[key])

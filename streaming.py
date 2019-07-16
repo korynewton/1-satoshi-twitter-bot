@@ -2,7 +2,7 @@ import tweepy as tp
 from settings import *
 from emoji_dict import *
 import pickle
-
+import time
 
 # twitter credentials
 consumer_key = CONSUMER_KEY
@@ -11,17 +11,18 @@ access_token = ACCESS_TOKEN
 access_secret = ACCESS_SECRET
 fixer_key = FIXER_KEY
 
-# import current price data from file
-pickle_in = open('price_data.txt', 'rb')
-price_data = pickle.load(pickle_in)
-
-
-# override tweepy.StreamListener to add logic to on_status
-
 
 class MyStreamListener(tp.StreamListener):
+    def __init__(self):
+        # authenticate stream
+        self.auth = tp.OAuthHandler(consumer_key, consumer_secret)
+        self.auth.set_access_token(access_token, access_secret)
+        self.api = tp.API(self.auth)
 
     def on_status(self, status):
+        print(status.text)
+        pickle_in = open('price_data.txt', 'rb')
+        price_data = pickle.load(pickle_in)
         # filter
         split = status.text.split()
         currency = [i.upper() for i in split if len(i) == 3]
@@ -29,7 +30,25 @@ class MyStreamListener(tp.StreamListener):
             if item in price_data:
                 self.compose(status, item)
 
+    def on_error(self, status):
+        try:
+            if status == 420:
+                print("*Being Rate Limited*", status)
+            else:
+                print('error', status)
+            return True
+        except BaseException as e:
+            print(f'error on data {e}')
+        return True
+
+    def on_disconnect(self):
+        time.sleep(100)
+        return
+
     def compose(self, status, curr):
+        pickle_in = open('price_data.txt', 'rb')
+        price_data = pickle.load(pickle_in)
+
         larger_baseline = ['JPY', 'INR', 'KRW']
 
         emoji = emoji_dict[curr]
@@ -158,7 +177,7 @@ class MyStreamListener(tp.StreamListener):
                 '\n' + f'   10,000 sats = {ten_thousand} {curr}' + \
                 '\n' + f'   1,000,000 sats = {million} {curr}' + \
                 '\n' + '\n' + \
-                f'1 #bitcoin = {bitcoin} {curr} {emoji}'
+                f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
         print(text)
         print('length:', len(text))
@@ -166,19 +185,6 @@ class MyStreamListener(tp.StreamListener):
         self.tweet_it(text, status.id)
 
     def tweet_it(self, text, reply_id):
-        api.update_status(
+        self.api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
-        # api.update_status(status,)
-        print('reply ID:', reply_id)
         print('tweeted')
-
-
-auth = tp.OAuthHandler(consumer_key, consumer_secret)
-auth.set_access_token(access_token, access_secret)
-api = tp.API(auth)
-
-myStreamListener = MyStreamListener()
-myStream = tp.Stream(auth=api.auth, listener=myStreamListener)
-
-
-myStream.filter(track=['@1satoshibot'], is_async=True)

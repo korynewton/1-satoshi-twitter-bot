@@ -57,4 +57,4 @@ class ScheduledTweet():
 
     def tweet(self, text):
         self.api.update_status(text)
-        print('tweeted')
+        print('tweeted scheduled tweet')

@@ -14,21 +14,27 @@ fixer_key = FIXER_KEY
 
 class MyStreamListener(tp.StreamListener):
     def __init__(self):
+        tp.StreamListener.__init__(self)
         # authenticate stream
         self.auth = tp.OAuthHandler(consumer_key, consumer_secret)
         self.auth.set_access_token(access_token, access_secret)
         self.api = tp.API(self.auth)
 
+    def on_connect(self):
+        print('***Stream Connected***')
+        pass
+
     def on_status(self, status):
-        print(status.text)
+        # print(status.text)
         pickle_in = open('price_data.txt', 'rb')
         price_data = pickle.load(pickle_in)
         # filter
         split = status.text.split()
-        currency = [i.upper() for i in split if len(i) == 3]
+        currency = [i.upper() for i in split if len(i) ==
+                    3 and i.upper() in price_data]
+
         for item in currency:
-            if item in price_data:
-                self.compose(status, item)
+            self.compose(status, item)
 
     def on_error(self, status):
         try:
@@ -42,6 +48,7 @@ class MyStreamListener(tp.StreamListener):
         return True
 
     def on_disconnect(self):
+        print('**DISCONNECTED**')
         time.sleep(100)
         return
 
@@ -180,7 +187,6 @@ class MyStreamListener(tp.StreamListener):
                 f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
         print(text)
-        print('length:', len(text))
 
         self.tweet_it(text, status.id)
 

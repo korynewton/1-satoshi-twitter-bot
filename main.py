@@ -18,17 +18,16 @@ fixer_key = FIXER_KEY
 
 if __name__ == "__main__":
     # Get data, store in price_data.txt
-    Retrieve_Data()
 
     # Initialize stream to listen for mentions
     myStreamListener = MyStreamListener()
     myStream = tp.Stream(auth=myStreamListener.api.auth,
                          listener=myStreamListener)
-    myStream.filter(track=['1satoshibot'], is_async=True)
+    myStream.filter(track=['@1satoshibot'], is_async=True)
 
     while True:
         Retrieve_Data()
         ScheduledTweet()
         wait = 50 * 60 + (random.randint(1, 30) * 60)
+        print(f'waiting {wait} seconds')
         time.sleep(wait)
-        print(f'waited {wait} seconds')

@@ -17,8 +17,6 @@ fixer_key = FIXER_KEY
 
 
 if __name__ == "__main__":
-    # Get data, store in price_data.txt
-
     # Initialize stream to listen for mentions
     myStreamListener = MyStreamListener()
     myStream = tp.Stream(auth=myStreamListener.api.auth,

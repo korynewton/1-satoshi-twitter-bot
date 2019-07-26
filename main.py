@@ -1,6 +1,7 @@
 import tweepy as tp
 import time
 import random
+from urllib3.exceptions import ProtocolError
 
 from settings import *
 from streaming import MyStreamListener
@@ -17,17 +18,20 @@ fixer_key = FIXER_KEY
 
 
 if __name__ == "__main__":
-    # Get data, store in price_data.txt
-
     # Initialize stream to listen for mentions
     myStreamListener = MyStreamListener()
     myStream = tp.Stream(auth=myStreamListener.api.auth,
                          listener=myStreamListener)
-    myStream.filter(track=['@1satoshibot'], is_async=True)
-
     while True:
-        Retrieve_Data()
-        ScheduledTweet()
-        wait = 50 * 60 + (random.randint(1, 30) * 60)
-        print(f'waiting {wait} seconds')
-        time.sleep(wait)
+        try:
+            myStream.filter(track=['usd'], is_async=True)
+        except (ProtocolError, AttributeError) as e:
+            print(e)
+            continue
+
+        while True:
+            # Retrieve_Data()
+            ScheduledTweet()
+            wait = 50 * 60 + (random.randint(1, 30) * 60)
+            print(f'waiting {wait} seconds')
+            time.sleep(wait)

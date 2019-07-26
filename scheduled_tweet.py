@@ -52,7 +52,7 @@ class ScheduledTweet():
 
         to_be_tweeted = to_be_tweeted + \
             '            ' + '#Bitcoin #StackingSats'
-        print(to_be_tweeted)
+        # print(to_be_tweeted)
         self.tweet(to_be_tweeted)
 
     def tweet(self, text):

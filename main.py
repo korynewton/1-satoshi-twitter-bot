@@ -24,13 +24,13 @@ if __name__ == "__main__":
                          listener=myStreamListener)
     while True:
         try:
-            myStream.filter(track=['usd'], is_async=True)
+            myStream.filter(track=['@1satoshibot'], is_async=True)
         except (ProtocolError, AttributeError) as e:
             print(e)
             continue
 
         while True:
-            # Retrieve_Data()
+            Retrieve_Data()
             ScheduledTweet()
             wait = 50 * 60 + (random.randint(1, 30) * 60)
             print(f'waiting {wait} seconds')

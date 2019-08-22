@@ -60,7 +60,7 @@ def scheduled_tweet():
     return tweet
 
 
-def update_data():
+def fetch_price_data():
     rates_data = {}
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
         FIXER_KEY + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'

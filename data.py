@@ -1,58 +1,53 @@
-import requests
-import time
-import random
-import pickle
-
-from settings import *
-from emoji_dict import *
+import sqlite3
+from sqlite3 import Error
+from helpers import fetch_price_data
+import os
 
 
-fixer_key = FIXER_KEY
+def return_conn():
+    return sqlite3.connect('data.db')
 
 
-class Retrieve_Data():
-    def __init__(self):
-        self.get_data()
+def initial_retrieval():
+    data = fetch_price_data()
 
-    def get_data(self):
-        rates_data = {}
-        fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
-            fixer_key + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'
-        url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
+    conn = return_conn()
+    c = conn.cursor()
+
+    # insert and commit to database
+    for key, value in data.items():
+        c.execute(
+            'INSERT INTO prices(currency, price) VALUES (?,?)', (key, value))
+    conn.commit()
+    conn.close()
+
+
+def initialize_db():
+    exists = os.path.exists('data.db')
+
+    if not exists:
         try:
-            # retrieve data from coinbase and fixer apis
-            cb_json_data = requests.get(url).json()['data']['rates']
-            fixer_json_data = requests.get(fixer_url).json()['rates']
+            # create database
+            conn = return_conn()
+            c = conn.cursor()
+            # create table in databse
+            c.execute(
+                'CREATE TABLE prices (id integer PRIMARY KEY, currency text unique,price real)')
+        except Error as e:
+            print(e)
+        finally:
+            return conn
 
-            # print(cb_json_data)
-            print('USD:', cb_json_data['USD'])
 
-            # from cb data, store data there are emojis for in rates_data, convert to sats
-            for key in emoji_dict:
-                if key in cb_json_data:
-                    price_sats = float(cb_json_data[key])
-                    rates_data[key] = str(price_sats / 100000000)
+def update_data():
+    updated_prices = fetch_price_data()
 
-            # for fixer data, get conversion based on EUR/BTC pair, multiply fixer currency with conversion rate
-            EUR = fixer_json_data['EUR']
-            BTC = fixer_json_data['BTC']
-            bitprice = (EUR / BTC)
-            fixer_json_data.update((x, y*bitprice / 100000000)
-                                   for x, y in fixer_json_data.items())
-            for key in fixer_json_data:
-                if not key == 'BTC' and not key == 'EUR':
-                    rates_data[key] = str(fixer_json_data[key])
+    conn = return_conn()
+    c = conn.cursor()
 
-            for key in rates_data:
-                rates_data[key] = float(rates_data[key])
-
-            pickle_out = open('price_data.txt', 'wb')
-            pickle.dump(rates_data, pickle_out)
-            pickle_out.close()
-
-            # print(rates_data)
-
-        except:
-            print('request failed')
-            time.sleep(1000)
-            self.get_data()
+    # insert and commit to database
+    for key, value in updated_prices.items():
+        c.execute(
+            'UPDATE prices SET price = ? WHERE currency = ?', (value, key))
+    conn.commit()
+    conn.close()

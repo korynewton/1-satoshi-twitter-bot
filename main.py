@@ -2,10 +2,12 @@ import tweepy as tp
 import os
 import time
 import random
-from data import initial_retrieval, initialize_db, update_data
+import threading
 
-from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY
+from emoji_dict import *
+from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data
+from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY
 
 
 class Authentication:
@@ -18,13 +20,166 @@ class Authentication:
 
 
 class StdOutListener(tp.StreamListener):
+    def __init__(self, api):
+        # api with authentication
+        self.api = api
+
     def on_error(self, status):
         print('error: ', status)
 
     def on_status(self, status):
-        print('tweet: ', status)
+        split = status.text.split(" ")
+        currency = [i.upper() for i in split if len(i) ==
+                    3 and i.upper() in SYMBOL_KEY]
+        for item in currency:
+            self.compose(status, item)
 
-        # TODO handle composing and tweeting when bot is mentioned
+    def get_price_data(self, curr):
+        conn = return_conn()
+        c = conn.cursor()
+
+        query = 'SELECT currency,price from prices WHERE currency = (?)'
+        c.execute(query, (curr,))
+
+        data = c.fetchone()
+
+        return data
+
+    def compose(self, status, curr):
+        emoji = emoji_dict[curr]
+
+        price_data = self.get_price_data(curr)
+
+        sats = float(price_data[1])
+
+        hundred = sats * 100
+        thousand = sats * 1000
+        ten_thousand = sats * 10000
+        hundred_k = sats * 100000
+        million = sats * 1000000
+        bitcoin = sats * 100000000
+
+        single_unit = 1 / sats
+        hundredths_unit = single_unit / 100
+        ten_units = single_unit * 10
+        hundred_units = single_unit * 100
+        five_hundred_units = single_unit * 500
+        thousand_units = single_unit * 1000
+        ten_thousand_units = single_unit * 10000
+        hundred_thousand_units = single_unit * 100000
+
+        #  format numbers
+        bitcoin = '{0:,}'.format(round(bitcoin))
+
+        if sats > 1:
+            sats = '{0:.2f}'.format(sats)
+        else:
+            sats = '{0:.5f}'.format(sats)
+
+        if hundred > 1:
+            hundred = '{0:.2f}'.format(hundred)
+        else:
+            hundred = '{0:.5f}'.format(hundred)
+
+        if thousand > 1:
+            thousand = '{0:,.2f}'.format(thousand)
+        else:
+            thousand = '{0:.5f}'.format(thousand)
+
+        if ten_thousand > 1:
+            ten_thousand = '{0:,.2f}'.format(ten_thousand)
+        else:
+            ten_thousand = '{0:.5f}'.format(ten_thousand)
+
+        if hundred_k > 1:
+            hundred_k = '{0:,.2f}'.format(hundred_k)
+        else:
+            hundred_k = '{0:.5f}'.format(hundred_k)
+
+        if million > 1:
+            if million > 1000:
+                million = '{:,d}'.format(round(million))
+            else:
+                million = '{0:.2f}'.format(million)
+        else:
+            million = '{0:.5f}'.format(million)
+
+        # satoshi equivalent to currency
+        if single_unit > 1:
+            single_unit = '{:,d}'.format(round(single_unit))
+        else:
+            single_unit = '{0:.2f}'.format(single_unit)
+
+        if ten_units > 100:
+            ten_units = '{:,}'.format(round(ten_units))
+        else:
+            ten_units = '{0:.2f}'.format(ten_units)
+
+        if hundred_units > 100:
+            hundred_units = '{:,}'.format(round(hundred_units))
+        else:
+            hundred_units = '{0:.2f}'.format(hundred_units)
+
+        if thousand_units > 100:
+            thousand_units = '{:,}'.format(round(thousand_units))
+        else:
+            thousand_units = '{0:.2f}'.format(thousand_units)
+
+        if five_hundred_units > 100:
+            five_hundred_units = '{:,}'.format(round(five_hundred_units))
+        else:
+            five_hundred_units = '{0:.2f}'.format(five_hundred_units)
+
+        if ten_thousand_units > 100:
+            ten_thousand_units = '{:,}'.format(round(ten_thousand_units))
+        else:
+            ten_thousand_units = '{0:.2f}'.format(ten_thousand_units)
+
+        if hundred_thousand_units > 100:
+            hundred_thousand_units = '{:,}'.format(
+                round(hundred_thousand_units))
+        else:
+            hundred_thousand_units = '{0:.2f}'.format(hundred_thousand_units)
+
+        if hundredths_unit > 1:
+            hundredths_unit = '{:,}'.format(round(hundredths_unit))
+        else:
+            hundredths_unit = '{0:.2f}'.format(hundredths_unit)
+
+        larger_baseline = ['JPY', 'INR', 'KRW']
+        if curr in larger_baseline:
+            text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
+                '\n' + f'   1 {curr} = {single_unit} sats' + \
+                '\n' + f'   1,000 {curr} = {thousand_units} sats' + \
+                '\n' + f'   10,000 {curr} = {ten_thousand_units} sats' + \
+                '\n' + f'   100,000 {curr} = {hundred_thousand_units} sats' + \
+                '\n' + '\n' + \
+                '\n' + f'   1 sat = {sats} {curr}' + \
+                '\n' + f'   100 sats = {hundred} {curr}' + \
+                '\n' + f'   1,000 sats = {thousand} {curr}' + \
+                '\n' + f'   1,000,000 sats = {million} {curr}' + \
+                '\n' + '\n' + \
+                f'1 #bitcoin = {bitcoin} {curr} {emoji}'
+        else:
+            text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
+                '\n' + f'   .01 {curr} = {hundredths_unit} sats' + \
+                '\n' + f'   1 {curr} = {single_unit} sats' + \
+                '\n' + f'   100 {curr} = {hundred_units} sats' + \
+                '\n' + f'   1,000 {curr} = {thousand_units} sats' + \
+                '\n' + '\n' + \
+                '\n' + f'   1 sat = {sats} {curr}' + \
+                '\n' + f'   100 sats = {hundred} {curr}' + \
+                '\n' + f'   10,000 sats = {ten_thousand} {curr}' + \
+                '\n' + f'   1,000,000 sats = {million} {curr}' + \
+                '\n' + '\n' + \
+                f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
+
+        self.tweet(text, status.id)
+
+    def tweet(self, text, reply_id):
+        self.api.update_status(
+            status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
+        print('tweeted reply to:', reply_id)
 
 
 if __name__ == "__main__":
@@ -41,16 +196,15 @@ if __name__ == "__main__":
     api = tp.API(auth)
 
     # initialize stream
-    listener = StdOutListener()
+    listener = StdOutListener(api)
     stream = tp.Stream(auth, listener)
 
-    stream.filter(track=['@1satoshibot'], is_async=True)
+    stream.filter(track=['usd'], is_async=True)
 
     while True:
-        print('***** while loop ********* : ')
         tweet = scheduled_tweet()
-        print(tweet)
-        # api.update_status(tweet)
+        print('tweet')
+        api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 + (random.randint(1, 30)) * 60)

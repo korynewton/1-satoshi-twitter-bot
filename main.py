@@ -1,37 +1,58 @@
 import tweepy as tp
+import os
 import time
 import random
-from urllib3.exceptions import ProtocolError
+from data import initial_retrieval, initialize_db, update_data
 
-from settings import *
-from streaming import MyStreamListener
-from scheduled_tweet import ScheduledTweet
-from data import Retrieve_Data
+from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY
+from helpers import scheduled_tweet, fetch_price_data
 
 
-# twitter credentials
-consumer_key = CONSUMER_KEY
-consumer_secret = CONSUMER_SECRET
-access_token = ACCESS_TOKEN
-access_secret = ACCESS_SECRET
-fixer_key = FIXER_KEY
+class Authentication:
+    def __init__(self):
+        self.auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+        self.auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+
+    def handle_auth(self):
+        return self.auth
+
+
+class StdOutListener(tp.StreamListener):
+    def on_error(self, status):
+        print('error: ', status)
+
+    def on_status(self, status):
+        print('tweet: ', status)
+
+        # TODO handle composing and tweeting when bot is mentioned
 
 
 if __name__ == "__main__":
-    # Initialize stream to listen for mentions
-    myStreamListener = MyStreamListener()
-    myStream = tp.Stream(auth=myStreamListener.api.auth,
-                         listener=myStreamListener)
-    while True:
-        try:
-            myStream.filter(track=['usd'], is_async=True)
-        except (ProtocolError, AttributeError) as e:
-            print(e)
-            continue
+    # If db exists, update with recent data
+    # if it does not exist, initialize db
+    if os.path.exists('data.db'):
+        update_data()
+    else:
+        initialize_db()
+        initial_retrieval()
 
-        while True:
-            # Retrieve_Data()
-            ScheduledTweet()
-            wait = 50 * 60 + (random.randint(1, 30) * 60)
-            print(f'waiting {wait} seconds')
-            time.sleep(wait)
+    # authenticate tweepy
+    auth = Authentication().handle_auth()
+    api = tp.API(auth)
+
+    # initialize stream
+    listener = StdOutListener()
+    stream = tp.Stream(auth, listener)
+
+    stream.filter(track=['@1satoshibot'], is_async=True)
+
+    while True:
+        print('***** while loop ********* : ')
+        tweet = scheduled_tweet()
+        print(tweet)
+        # api.update_status(tweet)
+
+        # wait between 50 and 80 minutes until next tweet
+        wait = (50 + (random.randint(1, 30)) * 60)
+        time.sleep(wait)
+        update_data()

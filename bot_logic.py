@@ -2,8 +2,10 @@ import tweepy as tp
 import os
 import time
 import random
+from new_data import initial_retrieval, initialize_db
+
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY
-from helpers import compose_scheduled_tweet, update_data
+from helpers import scheduled_tweet, update_data
 
 
 class Authentication:
@@ -25,25 +27,25 @@ class StdOutListener(tp.StreamListener):
         # TODO handle composing and tweeting when bot is mentioned
 
 
-def scheduled_tweet():
-    pass
-
-
 if __name__ == "__main__":
+    initialize_db()
+    initial_retrieval()
+
     auth = Authentication().handle_auth()
     api = tp.API(auth)
 
     listener = StdOutListener()
     stream = tp.Stream(auth, listener)
 
-    stream.filter(track=["@1satoshibot"], is_async=True)
+    stream.filter(track=['1satoshibot'], is_async=True)
 
     while True:
-        update_data()
         print('***** while loop ********* : ')
-        tweet = compose_scheduled_tweet()
+        tweet = scheduled_tweet()
+        print(tweet)
         # api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet
         wait = 50 * 60 + (random.randint(1, 30) * 60)
         time.sleep(wait)
+        update_data()

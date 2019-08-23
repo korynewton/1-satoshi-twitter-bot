@@ -18,7 +18,13 @@ def get_price_info(selected):
     return with_data
 
 
-def compose_scheduled_tweet(selected):
+def compose_scheduled_tweet(selected, region=None):
+    n_america_hashtags = ['#NorthAmerica', '#Norteamérica']
+    s_america_hashtags = ['#SouthAmerica', '#Sudamérica']
+    eur_hashtags = ["#Европа", "#Europa",
+                    "#LEurope", "#Europe", "#Avrupa", "#Європа"]
+    africa_hashtags = ['#Afrika', '#Africa', '#አፍሪካ', '#Afirika', '#Afrịka']
+
     to_be_tweeted = '1 #satoshi =        '
 
     for i in range(len(selected)):
@@ -37,9 +43,25 @@ def compose_scheduled_tweet(selected):
             to_be_tweeted += '   ' + \
                 str(price) + ' $' + curr + ' ' + emoji + '\n'
 
-    to_be_tweeted = to_be_tweeted + \
-        '                       ' + '#Bitcoin'
+    if region:
+        if region == "North America":
+            random.shuffle(n_america_hashtags)
+            for i in range(2):
+                to_be_tweeted += f"{n_america_hashtags[i]} "
+        elif region == "South America":
+            random.shuffle(s_america_hashtags)
+            for i in range(2):
+                to_be_tweeted += f"{s_america_hashtags[i]} "
+        elif region == "Europe":
+            random.shuffle(eur_hashtags)
+            for i in range(2):
+                to_be_tweeted += f"{eur_hashtags[i]} "
+        elif region == "Africa":
+            random.shuffle(africa_hashtags)
+            for i in range(2):
+                to_be_tweeted += f"{africa_hashtags[i]} "
 
+    to_be_tweeted += "#Bitcoin"
     return to_be_tweeted
 
 
@@ -48,6 +70,8 @@ def scheduled_tweet():
 
     # Select currencies at random
     random_select = random.sample(symbol_key, 13)
+
+    print(random_select)
 
     # retrieve data from database
     select_with_data = get_price_info(random_select)
@@ -92,3 +116,17 @@ def fetch_price_data():
 
     except:
         print('fixer or coinbase request failed')
+
+
+def regional_tweet(currencies, region):
+    # select 13 currencies from the region
+    random_select = random.sample(currencies, 13)
+
+    # get price data from database then shuffle the order
+    select_with_data = get_price_info(random_select)
+    random.shuffle(select_with_data)
+
+    # compose tweet
+    tweet = compose_scheduled_tweet(select_with_data, region)
+
+    return tweet

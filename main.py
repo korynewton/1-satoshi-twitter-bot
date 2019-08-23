@@ -6,8 +6,8 @@ import threading
 
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
-from helpers import scheduled_tweet, fetch_price_data
-from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY
+from helpers import scheduled_tweet, fetch_price_data, regional_tweet
+from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR
 
 
 class Authentication:
@@ -199,14 +199,41 @@ if __name__ == "__main__":
     listener = StdOutListener(api)
     stream = tp.Stream(auth, listener)
 
-    stream.filter(track=['usd'], is_async=True)
+    stream.filter(track=['@1satoshibot'], is_async=True)
 
     while True:
-        tweet = scheduled_tweet()
-        print('tweet')
+        num = random.randint(0, 10)
+
+        if num == 0:
+            # North America Regional Tweet
+            tweet = regional_tweet(NA_CURR, 'North America')
+            print("NA tweet coming up")
+        elif num == 1:
+            # South America Regional Tweet
+            tweet = regional_tweet(SA_CURR, "South America")
+            print("SA tweet coming up")
+        elif num == 2:
+            # Europe Regional Tweet
+            tweet = regional_tweet(EUR_CURR, "Europe")
+            print("EU tweet coming up")
+        elif num == 3:
+            # Africa Regional Tweet
+            tweet = regional_tweet(AF_CURR, "Africa")
+            print("Africa tweet coming up")
+        elif num == 4:
+            # Asia Regional Tweet
+            tweet = regional_tweet(AS_CURR, "ASIA")
+            print("Asia tweet coming up")
+        else:
+            # Standard Random Tweet
+            tweet = scheduled_tweet()
+            tweet += '                       ' + '#Bitcoin'
+
+        print('tweeted')
         api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet
-        wait = (50 + (random.randint(1, 30)) * 60)
+        wait = (50 * 60) + (random.randint(0, 30) * 60)
+        print(f"waiting {wait/60} minutes until next scheduled tweet")
         time.sleep(wait)
         update_data()

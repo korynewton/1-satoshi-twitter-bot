@@ -206,28 +206,27 @@ if __name__ == "__main__":
 
         if num == 0:
             # North America Regional Tweet
-            tweet = regional_tweet(NA_CURR, 'North America')
+            tweet = regional_tweet(NA_CURR)
             print("NA tweet coming up")
         elif num == 1:
             # South America Regional Tweet
-            tweet = regional_tweet(SA_CURR, "South America")
+            tweet = regional_tweet(SA_CURR)
             print("SA tweet coming up")
         elif num == 2:
             # Europe Regional Tweet
-            tweet = regional_tweet(EUR_CURR, "Europe")
+            tweet = regional_tweet(EUR_CURR)
             print("EU tweet coming up")
         elif num == 3:
             # Africa Regional Tweet
-            tweet = regional_tweet(AF_CURR, "Africa")
+            tweet = regional_tweet(AF_CURR)
             print("Africa tweet coming up")
         elif num == 4:
             # Asia Regional Tweet
-            tweet = regional_tweet(AS_CURR, "ASIA")
+            tweet = regional_tweet(AS_CURR)
             print("Asia tweet coming up")
         else:
             # Standard Random Tweet
             tweet = scheduled_tweet()
-            tweet += '                       ' + '#Bitcoin'
 
         print('tweeted')
         api.update_status(tweet)

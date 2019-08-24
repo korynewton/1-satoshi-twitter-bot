@@ -6,7 +6,7 @@ import threading
 
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
-from helpers import scheduled_tweet, fetch_price_data, regional_tweet
+from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
 
@@ -241,13 +241,15 @@ if __name__ == "__main__":
             tweet = scheduled_tweet(W_AS_CURR, "W_AS")
             print("West Asia tweet:")
         elif num == 9:
-            # least strong curr
+            # Weakest currencies
+            tweet = tweet_weakest()
+            print('Weakest currencies:')
         else:
             # Standard Random Tweet
             print("random tweet")
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        print(tweet)
+        # print(tweet)
         api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet

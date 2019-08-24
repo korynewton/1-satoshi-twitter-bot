@@ -120,3 +120,15 @@ def regional_tweet(currencies):
     tweet = compose_scheduled_tweet(select_with_data)
 
     return tweet
+
+
+def tweet_weakest():
+    conn = sqlite3.connect('data.db')
+    c = conn.cursor()
+
+    query = 'SELECT currency,price FROM prices ORDER BY price DESC LIMIT 13'
+    data = c.execute(query).fetchall()
+
+    tweet = compose_scheduled_tweet(data)
+
+    return tweet

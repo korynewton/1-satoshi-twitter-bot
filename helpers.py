@@ -19,6 +19,8 @@ def get_price_info(selected):
 
 
 def compose_scheduled_tweet(selected):
+    if len(selected) == 12:
+        print('inside compose', selected)
     to_be_tweeted = '1 #satoshi =        '
 
     for i in range(len(selected)):
@@ -42,7 +44,6 @@ def compose_scheduled_tweet(selected):
 
 
 def scheduled_tweet(currencies, region_name=None):
-    # symbol_key = SYMBOL_KEY
     _global = ['USD', 'EUR']
     max_num = 13 if len(currencies) > 13 else len(currencies)
 

@@ -246,10 +246,10 @@ if __name__ == "__main__":
             print('Weakest currencies:')
         else:
             # Standard Random Tweet
-            print("random tweet")
             tweet = scheduled_tweet(SYMBOL_KEY)
+            print("random tweet")
 
-        # print(tweet)
+        print(tweet)
         api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet

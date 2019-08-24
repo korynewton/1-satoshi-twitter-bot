@@ -1,6 +1,6 @@
 import random
 from emoji_dict import *
-from settings import FIXER_KEY, SYMBOL_KEY
+from settings import FIXER_KEY, SYMBOL_KEY, C_AS_CURR, S_AS_CURR
 import requests
 import sqlite3
 
@@ -18,7 +18,7 @@ def get_price_info(selected):
     return with_data
 
 
-def compose_scheduled_tweet(selected, region=None):
+def compose_scheduled_tweet(selected):
     to_be_tweeted = '1 #satoshi =        '
 
     for i in range(len(selected)):
@@ -41,16 +41,30 @@ def compose_scheduled_tweet(selected, region=None):
     return to_be_tweeted
 
 
-def scheduled_tweet():
-    symbol_key = SYMBOL_KEY
+def scheduled_tweet(currencies, region_name=None):
+    # symbol_key = SYMBOL_KEY
+    _global = ['USD', 'EUR']
+    max_num = 13 if len(currencies) > 13 else len(currencies)
 
     # Select currencies at random
-    random_select = random.sample(symbol_key, 13)
+    selected = random.sample(currencies, max_num)
 
-    print(random_select)
+    # ensure there is 13 currencies
+    if region_name == 'S_AS':
+        selected += _global
+        iterator = random.randint(0, len(C_AS_CURR)-1)
+        while len(selected) < 13:
+            selected.append(C_AS_CURR[iterator])
+            iterator = (iterator + 1) % len(C_AS_CURR)
+    elif region_name in ['SE_AS', 'C_AS', 'E_AS']:
+        selected += _global
+        iterator = random.randint(0, len(S_AS_CURR)-1)
+        while len(selected) < 13:
+            selected.append(S_AS_CURR[iterator])
+            iterator = (iterator + 1) % len(S_AS_CURR)
 
     # retrieve data from database
-    select_with_data = get_price_info(random_select)
+    select_with_data = get_price_info(selected)
     random.shuffle(select_with_data)
 
     # compose tweet

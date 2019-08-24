@@ -7,7 +7,7 @@ import threading
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet
-from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR
+from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
 
 class Authentication:
@@ -206,29 +206,48 @@ if __name__ == "__main__":
 
         if num == 0:
             # North America Regional Tweet
-            tweet = regional_tweet(NA_CURR)
-            print("NA tweet coming up")
+            tweet = scheduled_tweet(NA_CURR, 'NA')
+            print("NA tweet:")
         elif num == 1:
             # South America Regional Tweet
-            tweet = regional_tweet(SA_CURR)
-            print("SA tweet coming up")
+            tweet = scheduled_tweet(SA_CURR, 'SA')
+            print("SA tweet:")
         elif num == 2:
             # Europe Regional Tweet
-            tweet = regional_tweet(EUR_CURR)
-            print("EU tweet coming up")
+            tweet = scheduled_tweet(EUR_CURR, 'EU')
+            print("EU tweet:")
         elif num == 3:
             # Africa Regional Tweet
-            tweet = regional_tweet(AF_CURR)
-            print("Africa tweet coming up")
+            tweet = scheduled_tweet(AF_CURR, 'AF')
+            print("Africa tweet:")
         elif num == 4:
             # Asia Regional Tweet
-            tweet = regional_tweet(AS_CURR)
-            print("Asia tweet coming up")
+            tweet = scheduled_tweet(S_AS_CURR, "S_AS")
+            print("South Asia tweet:")
+        elif num == 5:
+            # SE Asia Regional Tweet
+            tweet = scheduled_tweet(E_AS_CURR, "E_AS")
+            print("East Asia tweet:")
+        elif num == 6:
+            # SE Asia Regional Tweet
+            tweet = scheduled_tweet(SE_AS_CURR, "SE_AS")
+            print("South East Asia tweet:")
+        elif num == 7:
+            # SE Asia Regional Tweet
+            tweet = scheduled_tweet(C_AS_CURR, "C_AS")
+            print("Central Asia tweet:")
+        elif num == 8:
+            # SE Asia Regional Tweet
+            tweet = scheduled_tweet(W_AS_CURR, "W_AS")
+            print("West Asia tweet:")
+        elif num == 9:
+            # least strong curr
         else:
             # Standard Random Tweet
-            tweet = scheduled_tweet()
+            print("random tweet")
+            tweet = scheduled_tweet(SYMBOL_KEY)
 
-        print('tweeted')
+        print(tweet)
         api.update_status(tweet)
 
         # wait between 50 and 80 minutes until next tweet

@@ -55,7 +55,7 @@ AF_CURR = ['NGN', 'KES', 'BWP', 'EGP', 'RWF', 'GHS', 'MWK',
            'LRD', 'LYD', 'MGA', 'MZN', 'SCR', 'SLL', 'SOS',
            'SDG', 'SSP', 'ZMK', 'ZWL', 'TND', 'MRO', 'STD']
 # South Asia
-S_AS_CURR = ['AFN', 'BDT', 'BTN', 'INR', 'MVR', 'NPR', 'PKR', 'LKR', 'NZD']
+S_AS_CURR = ['AFN', 'BDT', 'BTN', 'INR', 'MVR', 'NPR', 'PKR', 'LKR']
 # East Asia
 E_AS_CURR = ['CNY', 'JPY', 'MNT', 'KPW', 'KRW', 'TWD', 'HKD', 'MOP', 'CNH']
 # South East Asia
@@ -63,7 +63,7 @@ E_AS_CURR = ['CNY', 'JPY', 'MNT', 'KPW', 'KRW', 'TWD', 'HKD', 'MOP', 'CNH']
 SE_AS_CURR = ['AUD', 'BND', 'KHR', 'IDR', 'LAK',
               'MYR', 'MMK', 'PHP', 'THB', 'VND',
               'SGD', 'FJD', 'PGK', 'SBD', 'TOP',
-              'VUV', 'WST']
+              'VUV', 'WST', 'NZD']
 # Centra Asia currencies
 C_AS_CURR = ['KZT', 'KGS', 'TJS', 'TMT', 'UZS', 'RUB']
 # Middle East currencies

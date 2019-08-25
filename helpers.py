@@ -57,7 +57,7 @@ def scheduled_tweet(currencies, region_name=None):
         while len(selected) < 13:
             selected.append(C_AS_CURR[iterator])
             iterator = (iterator + 1) % len(C_AS_CURR)
-    elif region_name in ['SE_AS', 'C_AS', 'E_AS']:
+    elif region_name in ['C_AS', 'E_AS']:
         selected += _global
         iterator = random.randint(0, len(S_AS_CURR)-1)
         while len(selected) < 13:

@@ -3,6 +3,10 @@ from emoji_dict import *
 from settings import FIXER_KEY, SYMBOL_KEY, C_AS_CURR, S_AS_CURR
 import requests
 import sqlite3
+import logging
+
+
+logger = logging.getLogger()
 
 
 def get_price_info(selected):
@@ -19,8 +23,6 @@ def get_price_info(selected):
 
 
 def compose_scheduled_tweet(selected):
-    if len(selected) == 12:
-        print('inside compose', selected)
     to_be_tweeted = '1 #satoshi =        '
 
     for i in range(len(selected)):
@@ -70,6 +72,8 @@ def scheduled_tweet(currencies, region_name=None):
 
     # compose tweet
     tweet = compose_scheduled_tweet(select_with_data)
+    logger.info("composed tweet",  extra={
+                'currencies': selected, 'details': region_name})
 
     return tweet
 
@@ -129,7 +133,9 @@ def tweet_weakest():
 
     query = 'SELECT currency,price FROM prices ORDER BY price DESC LIMIT 13'
     data = c.execute(query).fetchall()
+    currencies = [i[0] for i in data]
 
     tweet = compose_scheduled_tweet(data)
+    logger.info('Weakest', extra={'currencies': currencies, 'details': ''})
 
     return tweet

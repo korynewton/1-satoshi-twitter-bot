@@ -3,11 +3,18 @@ import os
 import time
 import random
 import threading
+import logging
 
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
+
+
+logFormatter = '%(asctime)s - %(levelname)s - %(message)s - %(details)s - %(currencies)s '
+logging.basicConfig(format=logFormatter, level=logging.INFO,
+                    filename='logging.log', filemode='w')
+logger = logging.getLogger(__name__)
 
 
 class Authentication:
@@ -179,10 +186,12 @@ class StdOutListener(tp.StreamListener):
     def tweet(self, text, reply_id):
         self.api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
-        print('tweeted reply to:', reply_id)
+        logger.info('tweeted reply to:', extra={
+                    'details': reply_id, 'currencies': ''})
 
 
 if __name__ == "__main__":
+
     # If db exists, update with recent data
     # if it does not exist, initialize db
     if os.path.exists('data.db'):
@@ -199,7 +208,8 @@ if __name__ == "__main__":
     listener = StdOutListener(api)
     stream = tp.Stream(auth, listener)
 
-    stream.filter(track=['@1satoshibot'], is_async=True)
+    print('streaming')
+    stream.filter(track=['cat'], is_async=True)
 
     while True:
         num = random.randint(0, 10)
@@ -207,53 +217,43 @@ if __name__ == "__main__":
         if num == 0:
             # North America Regional Tweet
             tweet = scheduled_tweet(NA_CURR, 'NA')
-            print("NA tweet:")
         elif num == 1:
             # South America Regional Tweet
             tweet = scheduled_tweet(SA_CURR, 'SA')
-            print("SA tweet:")
         elif num == 2:
             # Europe Regional Tweet
             tweet = scheduled_tweet(EUR_CURR, 'EU')
-            print("EU tweet:")
         elif num == 3:
             # Africa Regional Tweet
             tweet = scheduled_tweet(AF_CURR, 'AF')
-            print("Africa tweet:")
         elif num == 4:
             # Asia Regional Tweet
             tweet = scheduled_tweet(S_AS_CURR, "S_AS")
-            print("South Asia tweet:")
         elif num == 5:
             # SE Asia Regional Tweet
             tweet = scheduled_tweet(E_AS_CURR, "E_AS")
-            print("East Asia tweet:")
         elif num == 6:
             # SE Asia Regional Tweet
             tweet = scheduled_tweet(SE_AS_CURR, "SE_AS")
-            print("South East Asia tweet:")
         elif num == 7:
             # SE Asia Regional Tweet
             tweet = scheduled_tweet(C_AS_CURR, "C_AS")
-            print("Central Asia tweet:")
         elif num == 8:
             # SE Asia Regional Tweet
             tweet = scheduled_tweet(W_AS_CURR, "W_AS")
-            print("West Asia tweet:")
         elif num == 9:
             # Weakest currencies
             tweet = tweet_weakest()
-            print('Weakest currencies:')
         else:
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
-            print("random tweet")
 
-        print(tweet)
-        api.update_status(tweet)
+        # api.update_status(tweet)
+        logger.info('Tweeted', extra={'currencies': '', 'details': ''})
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)
-        print(f"waiting {wait/60} minutes until next scheduled tweet")
+        logger.info(
+            f"waiting {wait/60} minutes until next scheduled tweet",  extra={'currencies': '', 'details': ''})
         time.sleep(wait)
         update_data()

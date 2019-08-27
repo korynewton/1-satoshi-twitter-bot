@@ -248,7 +248,7 @@ if __name__ == "__main__":
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        # api.update_status(tweet)
+        api.update_status(tweet)
         logger.info('Tweeted', extra={'currencies': '', 'details': ''})
 
         # wait between 50 and 80 minutes until next tweet

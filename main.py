@@ -41,6 +41,10 @@ class StdOutListener(tp.StreamListener):
         for item in currency:
             self.compose(status, item)
 
+    def on_exception(self, exception):
+        print(exception)
+        return
+
     def get_price_data(self, curr):
         conn = return_conn()
         c = conn.cursor()

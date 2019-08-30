@@ -35,11 +35,13 @@ class StdOutListener(tp.StreamListener):
         print('error: ', status)
 
     def on_status(self, status):
+        print("on status")
         split = status.text.split(" ")
         currency = [i.upper() for i in split if len(i) ==
                     3 and i.upper() in SYMBOL_KEY]
         for item in currency:
-            self.compose(status, item)
+            thread = threading.Thread(target=self.compose, args=(status, item))
+            thread.start()
 
     def on_exception(self, exception):
         print(exception)
@@ -257,6 +259,7 @@ if __name__ == "__main__":
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)
+        print('scheduled tweet')
         logger.info(
             f"waiting {wait/60} minutes until next scheduled tweet",  extra={'currencies': '', 'details': ''})
         time.sleep(wait)

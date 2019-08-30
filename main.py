@@ -35,7 +35,6 @@ class StdOutListener(tp.StreamListener):
         print('error: ', status)
 
     def on_status(self, status):
-        print("on status")
         split = status.text.split(" ")
         currency = [i.upper() for i in split if len(i) ==
                     3 and i.upper() in SYMBOL_KEY]

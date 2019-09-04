@@ -221,7 +221,7 @@ if __name__ == "__main__":
     stream = tp.Stream(auth, listener)
 
     print('streaming')
-    stream.filter(track=['usd'], is_async=True)
+    stream.filter(track=['@1satoshibot'], is_async=True)
 
     while True:
         num = random.randint(0, 10)

@@ -35,13 +35,19 @@ class StdOutListener(tp.StreamListener):
         print('error: ', status)
 
     def on_status(self, status):
-        print("on status")
-        split = status.text.split(" ")
+        # print("on status")
+        tweet = self.does_contain_currency(status.text)
+        if tweet:
+            for item in tweet:
+                thread = threading.Thread(
+                    target=self.compose, args=(status, item))
+                thread.start()
+
+    def does_contain_currency(self, text):
+        split = text.split(" ")
         currency = [i.upper() for i in split if len(i) ==
                     3 and i.upper() in SYMBOL_KEY]
-        for item in currency:
-            thread = threading.Thread(target=self.compose, args=(status, item))
-            thread.start()
+        return currency
 
     def on_exception(self, exception):
         print(exception)
@@ -215,7 +221,7 @@ if __name__ == "__main__":
     stream = tp.Stream(auth, listener)
 
     print('streaming')
-    stream.filter(track=['@1satoshibot'], is_async=True)
+    stream.filter(track=['usd'], is_async=True)
 
     while True:
         num = random.randint(0, 10)

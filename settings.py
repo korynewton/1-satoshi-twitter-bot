@@ -30,7 +30,7 @@ SYMBOL_KEY = ['GBP', 'JPY', 'EUR', 'USD', 'KZT', 'AUD', 'CAD', 'INR', 'RUB',
               'TOP', 'TTD', 'TWD', 'TZS', 'UAH', 'UGX', 'UYU', 'UZS', 'VND',
               'VUV', 'WST', 'YER', 'ZMW', 'CUP', 'KPW', 'SYP', 'SDG', 'IRR',
               'BYR', 'GMD', 'ANG', 'CNH', 'EEK', 'IMP', 'SGD', 'SHP', 'SSP',
-              'VEF', 'ZMK']
+              'VEF']
 
 
 # North America currencies
@@ -53,7 +53,7 @@ AF_CURR = ['NGN', 'KES', 'BWP', 'EGP', 'RWF', 'GHS', 'MWK',
            'DZD', 'AOA', 'BIF', 'CVE', 'KMF', 'CDF', 'XAF',
            'DJF', 'ERN', 'SZL', 'ETB', 'GMD', 'GNF', 'LSL',
            'LRD', 'LYD', 'MGA', 'MZN', 'SCR', 'SLL', 'SOS',
-           'SDG', 'SSP', 'ZMK', 'ZWL', 'TND', 'MRO', 'STD']
+           'SDG', 'SSP', 'ZWL', 'TND', 'MRO', 'STD']
 # South Asia
 S_AS_CURR = ['AFN', 'BDT', 'BTN', 'INR', 'MVR', 'NPR', 'PKR', 'LKR']
 # East Asia

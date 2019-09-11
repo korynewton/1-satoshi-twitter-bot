@@ -42,6 +42,7 @@ class StdOutListener(tp.StreamListener):
                 thread = threading.Thread(
                     target=self.compose, args=(status, item))
                 thread.start()
+                thread.join()
 
     def does_contain_currency(self, text):
         split = text.split(" ")

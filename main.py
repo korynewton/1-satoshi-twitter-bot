@@ -35,14 +35,19 @@ class StdOutListener(tp.StreamListener):
         print('error: ', status)
 
     def on_status(self, status):
-        # print("on status")
+        if hasattr(status, 'retweeted_status'):
+            return
+
         tweet = self.does_contain_currency(status.text)
         if tweet:
-            for item in tweet:
-                thread = threading.Thread(
-                    target=self.compose, args=(status, item))
-                thread.start()
-                thread.join()
+            try:
+                for item in tweet:
+                    thread = threading.Thread(
+                        target=self.compose, args=(status, item))
+                    thread.start()
+                    thread.join()
+            except:
+                return
 
     def does_contain_currency(self, text):
         split = text.split(" ")

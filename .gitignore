@@ -1,3 +1,4 @@
 .env
 save.txt
 logging.log
+data.db

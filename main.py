@@ -4,7 +4,7 @@ import time
 import random
 import threading
 import logging
-
+from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
@@ -31,29 +31,34 @@ class StdOutListener(tp.StreamListener):
         # api with authentication
         self.api = api
 
-    def on_error(self, status):
-        print('error: ', status)
+        num_worker_threads = 4
+        self.q = Queue()
+        for _ in range(num_worker_threads):
+            t = threading.Thread(target=self.analyze_mentions)
+            t.daemon = True
+            t.start()
 
     def on_status(self, status):
-        if hasattr(status, 'retweeted_status'):
-            return
+        self.q.put(status)
+        print('status:', status.id)
 
-        tweet = self.does_contain_currency(status.text)
-        if tweet:
-            try:
-                for item in tweet:
-                    thread = threading.Thread(
-                        target=self.compose, args=(status, item))
-                    thread.start()
-                    thread.join()
-            except:
-                return
+    def analyze_mentions(self):
+        while True:
+            status = self.q.get()
+
+            currencies = self.does_contain_currency(status.text)
+
+            if currencies and not hasattr(status, 'retweeted_status'):
+                for item in currencies:
+                    self.compose(status, item)
+
+            self.q.task_done()
 
     def does_contain_currency(self, text):
         split = text.split(" ")
-        currency = [i.upper() for i in split if len(i) ==
-                    3 and i.upper() in SYMBOL_KEY]
-        return currency
+        currency = {i.upper() for i in split if len(i) ==
+                    3 and i.upper() in SYMBOL_KEY}
+        return list(currency)
 
     def on_exception(self, exception):
         print(exception)

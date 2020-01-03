@@ -3,18 +3,11 @@ import os
 import time
 import random
 import threading
-import logging
 from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
-
-
-logFormatter = '%(asctime)s - %(levelname)s - %(message)s - %(details)s - %(currencies)s '
-logging.basicConfig(format=logFormatter, level=logging.INFO,
-                    filename='logging.log', filemode='w')
-logger = logging.getLogger(__name__)
 
 
 class Authentication:
@@ -209,8 +202,6 @@ class StdOutListener(tp.StreamListener):
     def tweet(self, text, reply_id):
         self.api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
-        logger.info('tweeted reply to:', extra={
-                    'details': reply_id, 'currencies': ''})
 
 
 if __name__ == "__main__":
@@ -272,12 +263,10 @@ if __name__ == "__main__":
             tweet = scheduled_tweet(SYMBOL_KEY)
 
         api.update_status(tweet)
-        logger.info('Tweeted', extra={'currencies': '', 'details': ''})
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)
         print('scheduled tweet')
-        logger.info(
-            f"waiting {wait/60} minutes until next scheduled tweet",  extra={'currencies': '', 'details': ''})
+
         time.sleep(wait)
         update_data()

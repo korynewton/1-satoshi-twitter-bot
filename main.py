@@ -9,14 +9,9 @@ from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
-
-class Authentication:
-    def __init__(self):
-        self.auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-        self.auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-
-    def handle_auth(self):
-        return self.auth
+# authenticate
+auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
 
 class StdOutListener(tp.StreamListener):

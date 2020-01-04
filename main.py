@@ -15,38 +15,8 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 
 
 class StdOutListener(tp.StreamListener):
-    def __init__(self, api):
-        # api with authentication
-        self.api = api
-
-        num_worker_threads = 4
-        self.q = Queue()
-        for _ in range(num_worker_threads):
-            t = threading.Thread(target=self.analyze_mentions)
-            t.daemon = True
-            t.start()
-
     def on_status(self, status):
-        self.q.put(status)
         print('status:', status.id)
-
-    def analyze_mentions(self):
-        while True:
-            status = self.q.get()
-
-            currencies = self.does_contain_currency(status.text)
-
-            if currencies and not hasattr(status, 'retweeted_status'):
-                for item in currencies:
-                    self.compose(status, item)
-
-            self.q.task_done()
-
-    def does_contain_currency(self, text):
-        split = text.split(" ")
-        currency = {i.upper() for i in split if len(i) ==
-                    3 and i.upper() in SYMBOL_KEY}
-        return list(currency)
 
     def on_exception(self, exception):
         print(exception)
@@ -208,10 +178,6 @@ if __name__ == "__main__":
     else:
         initialize_db()
         initial_retrieval()
-
-    # authenticate tweepy
-    auth = Authentication().handle_auth()
-    api = tp.API(auth)
 
     # initialize stream
     listener = StdOutListener(api)

@@ -3,6 +3,7 @@ import os
 import time
 import random
 import threading
+import re
 from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
@@ -28,6 +29,12 @@ class StdOutListener(tp.StreamListener):
         data = c.fetchone()
 
         return data
+
+    def does_contain_currency(self, text):
+        all_matches = re.findall(r"(?=("+'|'.join(SYMBOL_KEY)+r"))", text)
+        unique_matches = set(all_matches)
+
+        return list(unique_matches)
 
     def compose(self, status, curr):
         emoji = emoji_dict[curr]

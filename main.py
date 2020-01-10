@@ -13,11 +13,18 @@ from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN,
 
 class StdOutListener(tp.StreamListener):
     def on_status(self, status):
-        print('status:', status.id)
+        print('status id:', status.id)
 
     def on_exception(self, exception):
         print(exception)
         return
+
+    def is_not_retweet(self, status):
+        """checks if tweet is not a retweet"""
+        try:
+            return not hasattr(status, 'retweeted_status')
+        except:
+            return False
 
     def get_price_data(self, curr):
         conn = return_conn()
@@ -192,7 +199,7 @@ if __name__ == "__main__":
 
     # initialize and start stream thread
     stream_thread = threading.Thread(target=stream.filter, kwargs={
-                                     'track': ['kobe']}, daemon=True)
+                                     'track': ['@1satoshibot']}, daemon=True)
     stream_thread.start()
     print('streaming...')
 
@@ -233,8 +240,8 @@ if __name__ == "__main__":
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        api.update_status(tweet)
-        # print(tweet)
+        # api.update_status(tweet)
+        print(tweet)
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)

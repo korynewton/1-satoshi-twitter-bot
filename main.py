@@ -13,7 +13,12 @@ from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN,
 
 class StdOutListener(tp.StreamListener):
     def on_status(self, status):
+        # Check if tweet is not a retweet and contains a currency
         print('status id:', status.id)
+        currencies = self.contains_currency(status.text)
+        if self.is_not_retweet(status) and currencies:
+            for currency in currencies:
+                self.compose(status, currency)
 
     def on_exception(self, exception):
         print(exception)
@@ -37,7 +42,7 @@ class StdOutListener(tp.StreamListener):
 
         return data
 
-    def does_contain_currency(self, text):
+    def contains_currency(self, text):
         all_matches = re.findall(r"(?=("+'|'.join(SYMBOL_KEY)+r"))", text)
         unique_matches = set(all_matches)
 
@@ -172,7 +177,8 @@ class StdOutListener(tp.StreamListener):
                 '\n' + '\n' + \
                 f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
-        self.tweet(text, status.id)
+        # self.tweet(text, status.id)
+        print(text)
 
     def tweet(self, text, reply_id):
         self.api.update_status(
@@ -199,7 +205,7 @@ if __name__ == "__main__":
 
     # initialize and start stream thread
     stream_thread = threading.Thread(target=stream.filter, kwargs={
-                                     'track': ['@1satoshibot']}, daemon=True)
+                                     'track': ['@1satoshibot show']}, daemon=True)
     stream_thread.start()
     print('streaming...')
 

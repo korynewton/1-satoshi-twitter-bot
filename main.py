@@ -9,10 +9,6 @@ from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
-# authenticate
-auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-
 
 class StdOutListener(tp.StreamListener):
     def on_status(self, status):
@@ -170,7 +166,6 @@ class StdOutListener(tp.StreamListener):
 
 
 if __name__ == "__main__":
-
     # If db exists, update with recent data
     # if it does not exist, initialize db
     if os.path.exists('data.db'):
@@ -179,12 +174,20 @@ if __name__ == "__main__":
         initialize_db()
         initial_retrieval()
 
+    # Authenticate
+    auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+    api = tp.API(auth)
+
     # initialize stream
     listener = StdOutListener(api)
     stream = tp.Stream(auth, listener)
 
-    print('streaming')
-    stream.filter(track=['@1satoshibot show'], is_async=True)
+    # initialize and start stream thread
+    stream_thread = threading.Thread(target=stream.filter, kwargs={
+                                     'track': ['kobe']}, daemon=True)
+    stream_thread.start()
+    print('streaming...')
 
     while True:
         num = random.randint(0, 10)
@@ -224,6 +227,7 @@ if __name__ == "__main__":
             tweet = scheduled_tweet(SYMBOL_KEY)
 
         api.update_status(tweet)
+        # print(tweet)
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)

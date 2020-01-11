@@ -3,6 +3,7 @@ import os
 import time
 import random
 import threading
+import re
 from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
@@ -10,52 +11,25 @@ from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_wea
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
 
-class Authentication:
-    def __init__(self):
-        self.auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-        self.auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-
-    def handle_auth(self):
-        return self.auth
-
-
 class StdOutListener(tp.StreamListener):
-    def __init__(self, api):
-        # api with authentication
-        self.api = api
-
-        num_worker_threads = 4
-        self.q = Queue()
-        for _ in range(num_worker_threads):
-            t = threading.Thread(target=self.analyze_mentions)
-            t.daemon = True
-            t.start()
-
     def on_status(self, status):
-        self.q.put(status)
-        print('status:', status.id)
-
-    def analyze_mentions(self):
-        while True:
-            status = self.q.get()
-
-            currencies = self.does_contain_currency(status.text)
-
-            if currencies and not hasattr(status, 'retweeted_status'):
-                for item in currencies:
-                    self.compose(status, item)
-
-            self.q.task_done()
-
-    def does_contain_currency(self, text):
-        split = text.split(" ")
-        currency = {i.upper() for i in split if len(i) ==
-                    3 and i.upper() in SYMBOL_KEY}
-        return list(currency)
+        # Check if tweet is not a retweet and contains a currency
+        print('status id:', status.id)
+        currencies = self.contains_currency(status.text)
+        if self.is_not_retweet(status) and currencies:
+            for currency in currencies:
+                self.compose(status, currency)
 
     def on_exception(self, exception):
         print(exception)
         return
+
+    def is_not_retweet(self, status):
+        """checks if tweet is not a retweet"""
+        try:
+            return not hasattr(status, 'retweeted_status')
+        except:
+            return False
 
     def get_price_data(self, curr):
         conn = return_conn()
@@ -67,6 +41,12 @@ class StdOutListener(tp.StreamListener):
         data = c.fetchone()
 
         return data
+
+    def contains_currency(self, text):
+        all_matches = re.findall(r"(?=("+'|'.join(SYMBOL_KEY)+r"))", text)
+        unique_matches = set(all_matches)
+
+        return list(unique_matches)
 
     def compose(self, status, curr):
         emoji = emoji_dict[curr]
@@ -197,7 +177,8 @@ class StdOutListener(tp.StreamListener):
                 '\n' + '\n' + \
                 f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
-        self.tweet(text, status.id)
+        # self.tweet(text, status.id)
+        print(text)
 
     def tweet(self, text, reply_id):
         self.api.update_status(
@@ -205,7 +186,6 @@ class StdOutListener(tp.StreamListener):
 
 
 if __name__ == "__main__":
-
     # If db exists, update with recent data
     # if it does not exist, initialize db
     if os.path.exists('data.db'):
@@ -214,16 +194,20 @@ if __name__ == "__main__":
         initialize_db()
         initial_retrieval()
 
-    # authenticate tweepy
-    auth = Authentication().handle_auth()
+    # Authenticate
+    auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+    auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
     api = tp.API(auth)
 
     # initialize stream
     listener = StdOutListener(api)
     stream = tp.Stream(auth, listener)
 
-    print('streaming')
-    stream.filter(track=['@1satoshibot show'], is_async=True)
+    # initialize and start stream thread
+    stream_thread = threading.Thread(target=stream.filter, kwargs={
+                                     'track': ['@1satoshibot show']}, daemon=True)
+    stream_thread.start()
+    print('streaming...')
 
     while True:
         num = random.randint(0, 10)
@@ -262,7 +246,8 @@ if __name__ == "__main__":
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        api.update_status(tweet)
+        # api.update_status(tweet)
+        print(tweet)
 
         # wait between 50 and 80 minutes until next tweet
         wait = (50 * 60) + (random.randint(0, 30) * 60)

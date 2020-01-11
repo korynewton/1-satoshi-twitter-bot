@@ -2,3 +2,5 @@
 save.txt
 data.db
 venv
+.vscode/
+__pycache__/

@@ -7,7 +7,7 @@ import re
 from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
-from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest
+from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest, send_tweet
 from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
 
 
@@ -246,13 +246,16 @@ if __name__ == "__main__":
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        print('scheduled tweet:')
-        api.update_status(tweet)
-        print(tweet)
+        # send scheduled tweet or catch error and continue
+        try:
+            send_tweet(tweet, api)
+        except tp.TweepError as e:
+            print("error: ", e.response.text)
+            continue
 
         # wait between 120 and 200 min
         wait = (120 + random.randint(0, 80)) * 60
-        print(f"waiting {wait/60} min...")
+        print(f"waiting {wait/60} mins...")
         time.sleep(wait)
 
         update_data()

@@ -131,3 +131,9 @@ def tweet_weakest():
     tweet = compose_scheduled_tweet(data)
 
     return tweet
+
+
+def send_tweet(text, api):
+    print('tweeting scheduled tweet...')
+    api.update_status(text)
+    print(f"tweeted: {text}")

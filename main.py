@@ -4,7 +4,6 @@ import time
 import random
 import threading
 import re
-from queue import Queue
 from emoji_dict import *
 from data import initial_retrieval, initialize_db, update_data, return_conn
 from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest, send_tweet

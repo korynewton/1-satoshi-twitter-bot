@@ -127,7 +127,6 @@ def tweet_weakest():
 
     query = 'SELECT currency,price FROM prices ORDER BY price DESC LIMIT 13'
     data = c.execute(query).fetchall()
-    currencies = [i[0] for i in data]
 
     tweet = compose_scheduled_tweet(data)
 

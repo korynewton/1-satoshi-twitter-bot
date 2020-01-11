@@ -14,7 +14,7 @@ from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN,
 class StdOutListener(tp.StreamListener):
     def on_status(self, status):
         # Check if tweet is not a retweet and contains a currency
-        print('status id:', status.id)
+        print('stream listener triggered by status id:', status.id)
         currencies = self.contains_currency(status.text)
         if self.is_not_retweet(status) and currencies:
             for currency in currencies:
@@ -177,12 +177,12 @@ class StdOutListener(tp.StreamListener):
                 '\n' + '\n' + \
                 f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
-        # self.tweet(text, status.id)
-        print(text)
+        self.tweet(text, status.id)
 
     def tweet(self, text, reply_id):
         self.api.update_status(
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
+        print(f"responded to tweet id {reply_id} with {tweet}")
 
 
 if __name__ == "__main__":
@@ -246,12 +246,13 @@ if __name__ == "__main__":
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
-        # api.update_status(tweet)
+        print('scheduled tweet:')
+        api.update_status(tweet)
         print(tweet)
 
-        # wait between 50 and 80 minutes until next tweet
-        wait = (50 * 60) + (random.randint(0, 30) * 60)
-        print('scheduled tweet')
-
+        # wait between 120 and 200 min
+        wait = (120 + random.randint(0, 80)) * 60
+        print(f"waiting {wait/60} min...")
         time.sleep(wait)
+
         update_data()

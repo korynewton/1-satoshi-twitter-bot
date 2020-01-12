@@ -29,8 +29,7 @@ SYMBOL_KEY = ['GBP', 'JPY', 'EUR', 'USD', 'KZT', 'AUD', 'CAD', 'INR', 'RUB',
               'SLL', 'SOS', 'SRD', 'STD', 'THB', 'TJS', 'TMT', 'TND',
               'TOP', 'TTD', 'TWD', 'TZS', 'UAH', 'UGX', 'UYU', 'UZS', 'VND',
               'VUV', 'WST', 'YER', 'ZMW', 'CUP', 'KPW', 'SYP', 'SDG', 'IRR',
-              'BYR', 'GMD', 'ANG', 'CNH', 'EEK', 'IMP', 'SGD', 'SHP', 'SSP',
-              'VEF']
+              'BYR', 'GMD', 'ANG', 'CNH', 'EEK', 'IMP', 'SGD', 'SHP', 'SSP']
 
 
 # North America currencies
@@ -40,7 +39,7 @@ NA_CURR = ['USD', 'MXN', 'CAD', 'NIO', 'JMD', 'HTG', 'HNL', 'GTQ',
 # South America currencies
 SA_CURR = ['ARS', 'BOB', 'BRL', 'CLP', 'COP', 'FKP', 'GYD',
            'PYG', 'PEN', 'SRD', 'UYU', 'VES', 'USD', 'EUR',
-           'VEF', 'PAB']
+           'PAB']
 # European currencies
 EUR_CURR = ['EUR', 'GBP', 'ALL', 'AMD', 'AZN', 'BYN', 'BAM',
             'BGN', 'HRK', 'CZK', 'DKK', 'GEL', 'HUF', 'ISK',

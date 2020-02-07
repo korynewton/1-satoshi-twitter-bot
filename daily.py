@@ -1,5 +1,5 @@
 import tweepy as tp
-import random
+import random,time
 from settings import CONSUMER_KEY,CONSUMER_SECRET,ACCESS_TOKEN, ACCESS_SECRET
 
 # Authenticate
@@ -7,7 +7,12 @@ auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
 auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 api = tp.API(auth)
 
+# sleep
+hours = random.randint(1,4) * 60 * 60
+minutes = random.randint(1,60)*60
+time.sleep(hours+minutes)
 
+#select currency from list and tweet
 daily_show = ['USD', 'CAD', 'JPY', 'CNY', 'MXN', 'RUB', 'EUR', 'AUD', 'INR']
 currency = random.choice(daily_show)
 try:

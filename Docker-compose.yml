@@ -1,15 +1,15 @@
 version: '3.4'
 
 services:
-    main-bot:
-      depends_on:
-        - redis
-      build: main-bot
-      environment:
-        - CONSUMER_KEY=${CONSUMER_KEY}
-        - CONSUMER_SECRET=${CONSUMER_SECRET}
-        - ACCESS_TOKEN=${ACCESS_TOKEN}
-        - ACCESS_SECRET=${ACCESS_SECRET}
+  main-bot:
+    depends_on:
+      - redis
+    build: main-bot
+    environment:
+      - CONSUMER_KEY=${CONSUMER_KEY}
+      - CONSUMER_SECRET=${CONSUMER_SECRET}
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - ACCESS_SECRET=${ACCESS_SECRET}
   redis:
     image: redis
     ports:

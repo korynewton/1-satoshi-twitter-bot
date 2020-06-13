@@ -1,6 +1,6 @@
 .env
 save.txt
 data.db
-venv
+env
 .vscode/
 __pycache__/

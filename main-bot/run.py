@@ -1,18 +1,12 @@
-import os, time, random, tweepy as tp
+import time, random, tweepy as tp
 from os.path import join, dirname
-from dotenv import load_dotenv
 from utils import *
 
-
-dotenv_path = join(dirname(__file__), '../.env')
-load_dotenv(dotenv_path)
-
-
 #Twitter credentials
-CONSUMER_KEY = os.environ.get("CONSUMER_KEY")
-CONSUMER_SECRET = os.environ.get("CONSUMER_SECRET")
-ACCESS_TOKEN = os.environ.get("ACCESS_TOKEN")
-ACCESS_SECRET = os.environ.get("ACCESS_SECRET")
+CONSUMER_KEY = os.environ["CONSUMER_KEY"]
+CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
+ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+ACCESS_SECRET = os.environ["ACCESS_SECRET"]
 
 #authenticate
 auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
@@ -54,18 +48,20 @@ while True:
             '''todo:'''
             # Weakest currencies
             # tweet = tweet_weakest()
-            pass
+            tweet = "9"
         else:
             '''todo'''
             # Standard Random Tweet
             # tweet = scheduled_tweet(SYMBOL_KEY)
-            pass
+            tweet = "else"
 
-        # send scheduled tweet or catch error and continue
+ # send scheduled tweet or catch error and continue
         try:
             api.update_status(tweet)
         except tp.TweepError as e:
-            print("error: ", e.response.text)
+            print("error: ", e)
+            print("num: ", num)
+            print("tweet: ", tweet)
             continue
 
         # wait between 120 and 200 min

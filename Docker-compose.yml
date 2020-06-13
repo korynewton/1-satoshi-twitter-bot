@@ -1,12 +1,23 @@
 version: '3.4'
 
 services:
-  main-app:
-    build: main-bot
+    main-bot:
+      depends_on:
+        - redis
+      build: main-bot
+      environment:
+        - CONSUMER_KEY=${CONSUMER_KEY}
+        - CONSUMER_SECRET=${CONSUMER_SECRET}
+        - ACCESS_TOKEN=${ACCESS_TOKEN}
+        - ACCESS_SECRET=${ACCESS_SECRET}
+  redis:
+    image: redis
+    ports:
+      - 6379:6379
+  worker:
+    depends_on:
+      - redis
+    build: worker
     environment:
-      - CONSUMER_KEY=${CONSUMER_KEY}
-      - CONSUMER_SECRET=${CONSUMER_SECRET}
-      - ACCESS_TOKEN=${ACCESS_TOKEN}
-      - ACCESS_SECRET=${ACCESS_SECRET}
-#   redis:
-#     image: redis
+      - REDIS_HOST=${REDIS_HOST}
+      - FIXER_KEY=${FIXER_KEY}

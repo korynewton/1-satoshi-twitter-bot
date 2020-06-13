@@ -1,7 +1,7 @@
 import os, redis, time, requests, json
 from datetime import datetime
+from emoji_dict import emoji_dict
 
-emoji_dict = json.load(open('emojis.json', 'r'))
 
 REDIS_HOST = os.environ["REDIS_HOST"]
 FIXER_KEY = os.environ["FIXER_KEY"]

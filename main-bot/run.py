@@ -1,5 +1,5 @@
-import time, random, tweepy as tp
-from os.path import join, dirname
+import os, time, random, tweepy as tp
+from datetime import datetime
 from utils import *
 
 #Twitter credentials
@@ -59,12 +59,13 @@ while True:
         try:
             api.update_status(tweet)
         except tp.TweepError as e:
-            print("error: ", e)
-            print("num: ", num)
-            print("tweet: ", tweet)
+            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print("error details: ", e)
+            print("Number selected: ", num)
+            print("Error tweet: ", tweet)
             continue
 
         # wait between 120 and 200 min
         wait = (120 + random.randint(0, 80)) * 60
-        print(f"waiting {wait/60} mins...")
+        print(f"Tweeted at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, waiting {wait/60} mins...")
         time.sleep(wait)

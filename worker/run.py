@@ -61,4 +61,4 @@ if __name__ == "__main__":
         update_data()
         # sleep for hour
         print("data updated at ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        time.sleep(60)
+        time.sleep(60*60)

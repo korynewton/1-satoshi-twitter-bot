@@ -104,7 +104,7 @@ def compose_scheduled_tweet(selected):
         price = selected[i][1]
         emoji = emoji_dict[curr]
 
-        price = '{0:.4f}'.format(float(price))
+        price = '{0:.5f}'.format(float(price))
 
         if i == 0:
             to_be_tweeted += price + ' $' + curr + ' ' + emoji + '\n'
@@ -113,7 +113,7 @@ def compose_scheduled_tweet(selected):
             to_be_tweeted += price + ' $' + curr + ' ' + emoji
 
         else:
-            to_be_tweeted += '   ' + \
+            to_be_tweeted += ' ' + \
                 price + ' $' + curr + ' ' + emoji + '\n'
 
     to_be_tweeted += '                      #Bitcoin'

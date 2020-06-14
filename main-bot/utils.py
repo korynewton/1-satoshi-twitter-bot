@@ -1,4 +1,4 @@
-import random, json
+import random, redis, os
 from emoji_dict import emoji_dict
 
 
@@ -26,7 +26,6 @@ SYMBOL_KEY = ['GBP', 'JPY', 'EUR', 'USD', 'KZT', 'AUD', 'CAD', 'INR', 'RUB',
 NA_CURR = ['USD', 'MXN', 'CAD', 'NIO', 'JMD', 'HTG', 'HNL', 'GTQ',
            'DOP', 'CUP', 'CRC', 'KYD', 'BMD', 'BZD', 'BBD', 'BSD',
            'AWG', 'ANG', 'TTD']
-
 # South America currencies
 SA_CURR = ['ARS', 'BOB', 'BRL', 'CLP', 'COP', 'FKP', 'GYD',
            'PYG', 'PEN', 'SRD', 'UYU', 'VES', 'USD', 'EUR',
@@ -69,25 +68,30 @@ W_AS_CURR = ['AED', 'BHD', 'ILS', 'IQD', 'JOD', 'KWD',
              'IRR']
 
 
+REDIS_HOST = os.environ["REDIS_HOST"]
 
 def tweet_weakest():
-    '''todo after setting up redis container'''
-    pass
+    r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+    # get all redis keys (currency acronyms)
+    all_keys = r.keys('*')
+    #get all prices
+    data = r.mget(all_keys)
+    #combine keys with prices
+    with_data = [[all_keys[i], data[i]] for i in range(len(all_keys))]
+    #sort by price
+    with_data.sort(key=lambda x:float(x[1]), reverse=True)
 
+    tweet = compose_scheduled_tweet(with_data[:13])
+
+    return tweet
 
 def get_price_info(selected):
+    r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+    data = r.mget(selected)
     with_data = []
 
-    for curr in selected:
-        with_data.append([curr, .0004])
-    # conn = sqlite3.connect('data.db')
-    # c = conn.cursor()
-
-    # placeholder = '?'
-    # placeholders = ', '.join(placeholder for _ in selected)
-    # query = 'SELECT currency, price from prices WHERE currency IN (%s)' % placeholders
-
-    # with_data = c.execute(query, selected).fetchall()
+    for i in range(len(selected)):
+        with_data.append([selected[i], data[i]])
 
     return with_data
 
@@ -99,19 +103,20 @@ def compose_scheduled_tweet(selected):
         curr = selected[i][0]
         price = selected[i][1]
         emoji = emoji_dict[curr]
-        price = '{0:.5f}'.format(price)
+
+        price = '{0:.4f}'.format(float(price))
 
         if i == 0:
-            to_be_tweeted += str(price) + ' $' + curr + ' ' + emoji + '\n'
+            to_be_tweeted += price + ' $' + curr + ' ' + emoji + '\n'
 
         elif i % 2 != 0:
-            to_be_tweeted += str(price) + ' $' + curr + ' ' + emoji
+            to_be_tweeted += price + ' $' + curr + ' ' + emoji
 
         else:
             to_be_tweeted += '   ' + \
-                str(price) + ' $' + curr + ' ' + emoji + '\n'
+                price + ' $' + curr + ' ' + emoji + '\n'
 
-    to_be_tweeted += '                       #Bitcoin'
+    to_be_tweeted += '                      #Bitcoin'
     return to_be_tweeted
 
 
@@ -121,6 +126,7 @@ def scheduled_tweet(currencies, region_name=None):
 
     # Select currencies at random
     selected = random.sample(currencies, max_num)
+
 
     # ensure there is 13 currencies
     if region_name == 'S_AS':
@@ -135,6 +141,7 @@ def scheduled_tweet(currencies, region_name=None):
         while len(selected) < 13:
             selected.append(S_AS_CURR[iterator])
             iterator = (iterator + 1) % len(S_AS_CURR)
+
 
     # retrieve data from database
     select_with_data = get_price_info(selected)

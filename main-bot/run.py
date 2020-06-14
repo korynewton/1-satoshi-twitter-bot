@@ -45,15 +45,11 @@ while True:
             # SE Asia Regional Tweet
             tweet = scheduled_tweet(W_AS_CURR, "W_AS")
         elif num == 9:
-            '''todo:'''
             # Weakest currencies
-            # tweet = tweet_weakest()
-            tweet = "9"
+            tweet = tweet_weakest()
         else:
-            '''todo'''
             # Standard Random Tweet
-            # tweet = scheduled_tweet(SYMBOL_KEY)
-            tweet = "else"
+            tweet = scheduled_tweet(SYMBOL_KEY)
 
  # send scheduled tweet or catch error and continue
         try:

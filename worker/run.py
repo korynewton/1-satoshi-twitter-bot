@@ -46,19 +46,25 @@ def fetch_price_data():
 
 
 def update_data():
-    try:
-        #fetch data
-        data = fetch_price_data()
-        #set data
-        r.mset(data)
-    except Exception as e:
-        print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'), e)
+    #fetch data
+    data = fetch_price_data()
+    #set data
+    r.mset(data)
+        
 
 
 if __name__ == "__main__":
     
     while True:
-        update_data()
-        # sleep for hour
-        print("data updated at ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-        time.sleep(60*60)
+        try:
+            update_data()
+            # sleep for hour
+            print("data updated at ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            time.sleep(60*60)
+        except Exception as e:
+            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'), e)
+            #sleep for 10 seconds and try again
+            time.sleep(10)
+
+        
+

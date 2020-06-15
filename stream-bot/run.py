@@ -188,6 +188,7 @@ class StdOutListener(tp.StreamListener):
             print(f"Successful response to: {reply_id} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
         except Exception as e:
             print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+            print(e)
 
 
 

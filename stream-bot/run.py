@@ -1,19 +1,27 @@
-import tweepy as tp
-import os
-import time
-import random
-import threading
-import re
-from emoji_dict import *
-from data import initial_retrieval, initialize_db, update_data, return_conn
-from helpers import scheduled_tweet, fetch_price_data, regional_tweet, tweet_weakest, send_tweet
-from settings import CONSUMER_KEY, CONSUMER_SECRET, ACCESS_SECRET, ACCESS_TOKEN, FIXER_KEY, SYMBOL_KEY, NA_CURR, SA_CURR, EUR_CURR, AF_CURR, E_AS_CURR, SE_AS_CURR, C_AS_CURR, W_AS_CURR, S_AS_CURR
+import os, redis, re, tweepy as tp
+from utils import emoji_dict, SYMBOL_KEY
+from datetime import datetime
+
+#Twitter credentials
+CONSUMER_KEY = os.environ["CONSUMER_KEY"]
+CONSUMER_SECRET = os.environ["CONSUMER_SECRET"]
+ACCESS_TOKEN = os.environ["ACCESS_TOKEN"]
+ACCESS_SECRET = os.environ["ACCESS_SECRET"]
+
+#Redis host
+REDIS_HOST = os.environ["REDIS_HOST"]
+
+
+
+#authenticate with Twitter
+auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
+auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
+api = tp.API(auth)
 
 
 class StdOutListener(tp.StreamListener):
     def on_status(self, status):
         # Check if tweet is not a retweet and contains a currency
-        print('stream listener triggered by status id:', status.id)
         currencies = self.contains_currency(status.text)
         if self.is_not_retweet(status) and currencies:
             for currency in currencies:
@@ -31,15 +39,10 @@ class StdOutListener(tp.StreamListener):
             return False
 
     def get_price_data(self, curr):
-        conn = return_conn()
-        c = conn.cursor()
+        r = redis.Redis(host=REDIS_HOST,port=6379, db=0, decode_responses=True)
+        price = r.get(curr)
 
-        query = 'SELECT currency,price from prices WHERE currency = (?)'
-        c.execute(query, (curr,))
-
-        data = c.fetchone()
-
-        return data
+        return price
 
     def contains_currency(self, text):
         all_matches = re.findall(r"(?=("+'|'.join(SYMBOL_KEY)+r"))", text)
@@ -52,7 +55,7 @@ class StdOutListener(tp.StreamListener):
 
         price_data = self.get_price_data(curr)
 
-        sats = float(price_data[1])
+        sats = float(price_data)
 
         hundred = sats * 100
         thousand = sats * 1000
@@ -179,82 +182,17 @@ class StdOutListener(tp.StreamListener):
         self.tweet(text, status.id)
 
     def tweet(self, text, reply_id):
-        self.api.update_status(
-            status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
-        print(f"responded to tweet id {reply_id} with {tweet}")
-
-
-if __name__ == "__main__":
-    # If db exists, update with recent data
-    # if it does not exist, initialize db
-    if os.path.exists('data.db'):
-        update_data()
-    else:
-        initialize_db()
-        initial_retrieval()
-
-    # Authenticate
-    auth = tp.OAuthHandler(CONSUMER_KEY, CONSUMER_SECRET)
-    auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
-    api = tp.API(auth)
-
-    # initialize stream
-    listener = StdOutListener(api)
-    stream = tp.Stream(auth, listener)
-
-    # initialize and start stream thread
-    stream_thread = threading.Thread(target=stream.filter, kwargs={
-                                     'track': ['@1satoshibot show']}, daemon=True)
-    stream_thread.start()
-    print('streaming...')
-
-    while True:
-        num = random.randint(0, 10)
-
-        if num == 0:
-            # North America Regional Tweet
-            tweet = scheduled_tweet(NA_CURR, 'NA')
-        elif num == 1:
-            # South America Regional Tweet
-            tweet = scheduled_tweet(SA_CURR, 'SA')
-        elif num == 2:
-            # Europe Regional Tweet
-            tweet = scheduled_tweet(EUR_CURR, 'EU')
-        elif num == 3:
-            # Africa Regional Tweet
-            tweet = scheduled_tweet(AF_CURR, 'AF')
-        elif num == 4:
-            # Asia Regional Tweet
-            tweet = scheduled_tweet(S_AS_CURR, "S_AS")
-        elif num == 5:
-            # SE Asia Regional Tweet
-            tweet = scheduled_tweet(E_AS_CURR, "E_AS")
-        elif num == 6:
-            # SE Asia Regional Tweet
-            tweet = scheduled_tweet(SE_AS_CURR, "SE_AS")
-        elif num == 7:
-            # SE Asia Regional Tweet
-            tweet = scheduled_tweet(C_AS_CURR, "C_AS")
-        elif num == 8:
-            # SE Asia Regional Tweet
-            tweet = scheduled_tweet(W_AS_CURR, "W_AS")
-        elif num == 9:
-            # Weakest currencies
-            tweet = tweet_weakest()
-        else:
-            # Standard Random Tweet
-            tweet = scheduled_tweet(SYMBOL_KEY)
-
-        # send scheduled tweet or catch error and continue
         try:
-            send_tweet(tweet, api)
-        except tp.TweepError as e:
-            print("error: ", e.response.text)
-            continue
+            self.api.update_status(
+                status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
+            print(f"Successful response to: {reply_id} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        except Exception as e:
+            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
 
-        # wait between 120 and 200 min
-        wait = (120 + random.randint(0, 80)) * 60
-        print(f"waiting {wait/60} mins...")
-        time.sleep(wait)
 
-        update_data()
+
+
+#initialize listener and start stream
+listener = StdOutListener(api)
+stream = tp.Stream(auth, listener)
+stream.filter(track=['@1satoshibot show'])

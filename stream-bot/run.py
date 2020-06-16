@@ -1,4 +1,4 @@
-import os, redis, re, tweepy as tp
+import os, redis, re, time, tweepy as tp
 from utils import emoji_dict, SYMBOL_KEY
 from datetime import datetime
 
@@ -182,18 +182,21 @@ class StdOutListener(tp.StreamListener):
         self.tweet(text, status.id)
 
     def tweet(self, text, reply_id):
+        self.api.update_status(
+            status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
+        print(f"Successful response to: {reply_id} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+    
+
+
+if __name__ == "__main__":
+    while True:
         try:
-            self.api.update_status(
-                status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
-            print(f"Successful response to: {reply_id} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+            print("starting stream...")
+            #initialize listener and start stream
+            listener = StdOutListener(api)
+            stream = tp.Stream(auth, listener)
+            stream.filter(track=['@1satoshibot show'])
         except Exception as e:
-            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            print(e)
-
-
-
-
-#initialize listener and start stream
-listener = StdOutListener(api)
-stream = tp.Stream(auth, listener)
-stream.filter(track=['@1satoshibot show'])
+            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'), " waiting 30 seconds before next attempt")
+            print("error: ", e)
+            time.sleep(30)

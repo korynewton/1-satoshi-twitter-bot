@@ -14,6 +14,7 @@ auth.set_access_token(ACCESS_TOKEN, ACCESS_SECRET)
 api = tp.API(auth)
 
 while True:
+    try:
         #choose a random number between 0 - 10 to choose which region will be tweeted
         num = random.randint(0, 10)
 
@@ -51,17 +52,16 @@ while True:
             # Standard Random Tweet
             tweet = scheduled_tweet(SYMBOL_KEY)
 
- # send scheduled tweet or catch error and continue
-        try:
-            api.update_status(tweet)
-        except tp.TweepError as e:
-            print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
-            print("error details: ", e)
-            print("Number selected: ", num)
-            print("Error tweet: ", tweet)
-            continue
 
+        api.update_status(tweet)
         # wait between 120 and 200 min
         wait = (120 + random.randint(0, 80)) * 60
-        print(f"Tweeted at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, waiting {wait/60} mins...")
+        print(f"Tweeted successfully at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, waiting {wait/60} mins...")
         time.sleep(wait)
+    except Exception as e:
+        print("error at: ", datetime.now().strftime('%Y-%m-%d %H:%M:%S'))
+        print("error details: ", e)
+        print("Number selected: ", num)
+        print("Error tweet: ", tweet)
+        time.sleep(10)
+        continue

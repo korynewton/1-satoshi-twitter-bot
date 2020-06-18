@@ -12,9 +12,12 @@ services:
       - ACCESS_SECRET=${ACCESS_SECRET}
       - REDIS_HOST=${REDIS_HOST}
   redis:
-    image: redis
+    image: redis:latest
     ports:
       - 6379:6379
+    volumes:
+      - ./redis.config:/redis.conf
+    command: ['redis-server', '/redis.conf']
   worker:
     depends_on:
       - redis

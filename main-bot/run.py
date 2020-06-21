@@ -1,6 +1,7 @@
 import os, time, random, tweepy as tp
 from datetime import datetime
-from utils import *
+from acronym_dict import *
+from utils import scheduled_tweet, tweet_weakest
 
 #Twitter credentials
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
@@ -53,7 +54,8 @@ while True:
             tweet = scheduled_tweet(SYMBOL_KEY)
 
 
-        api.update_status(tweet)
+        # api.update_status(tweet)
+        print(tweet)
         # wait between 120 and 200 min
         wait = (120 + random.randint(0, 80)) * 60
         print(f"Tweeted successfully at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, waiting {wait/60} mins...")

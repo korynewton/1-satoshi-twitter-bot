@@ -2,7 +2,6 @@ import os, redis, time, requests, json
 from datetime import datetime
 from emoji_dict import emoji_dict
 
-
 REDIS_HOST = os.environ["REDIS_HOST"]
 FIXER_KEY = os.environ["FIXER_KEY"]
 
@@ -11,10 +10,10 @@ r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
 def fetch_price_data():
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
         FIXER_KEY + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'
-    url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
+    coinbase_url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
     try:
             # retrieve data from coinbase and fixer apis
-        cb_json_data = requests.get(url).json()['data']['rates']
+        cb_json_data = requests.get(coinbase_url).json()['data']['rates']
         fixer_json_data = requests.get(fixer_url).json()['rates']
 
         rates_data = {}

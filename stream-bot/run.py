@@ -1,6 +1,7 @@
 import os, redis, re, time, tweepy as tp
-from utils import emoji_dict, SYMBOL_KEY
+from acronym_dict import SYMBOL_KEY
 from datetime import datetime
+from emoji_dict import emoji_dict
 
 #Twitter credentials
 CONSUMER_KEY = os.environ["CONSUMER_KEY"]
@@ -10,7 +11,7 @@ ACCESS_SECRET = os.environ["ACCESS_SECRET"]
 
 #Redis host
 REDIS_HOST = os.environ["REDIS_HOST"]
-
+r = redis.Redis(host=REDIS_HOST,port=6379, db=0, decode_responses=True)
 
 
 #authenticate with Twitter
@@ -39,7 +40,6 @@ class StdOutListener(tp.StreamListener):
             return False
 
     def get_price_data(self, curr):
-        r = redis.Redis(host=REDIS_HOST,port=6379, db=0, decode_responses=True)
         price = r.get(curr)
 
         return price

@@ -5,6 +5,9 @@ services:
     depends_on:
       - worker
     build: main-bot
+    volumes:
+      - ./emoji_dict.py:/usr/src/main-bot/emoji_dict.py
+      - ./acronym_dict.py:/usr/src/main-bot/acronym_dict.py
     environment:
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}
@@ -22,6 +25,9 @@ services:
     depends_on:
       - redis
     build: worker
+    volumes:
+      - ./emoji_dict.py:/usr/src/worker/emoji_dict.py
+      - ./acronym_dict.py:/usr/src/worker/acronym_dict.py
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - FIXER_KEY=${FIXER_KEY}
@@ -29,6 +35,9 @@ services:
     depends_on:
       - redis
     build: stream-bot
+    volumes:
+      - ./emoji_dict.py:/usr/src/stream-bot/emoji_dict.py
+      - ./acronym_dict.py:/usr/src/stream-bot/acronym_dict.py
     environment:
       - CONSUMER_KEY=${CONSUMER_KEY}
       - CONSUMER_SECRET=${CONSUMER_SECRET}

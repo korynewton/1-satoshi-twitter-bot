@@ -54,8 +54,7 @@ while True:
             tweet = scheduled_tweet(SYMBOL_KEY)
 
 
-        # api.update_status(tweet)
-        print(tweet)
+        api.update_status(tweet)
         # wait between 120 and 200 min
         wait = (120 + random.randint(0, 80)) * 60
         print(f"Tweeted successfully at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}, waiting {wait/60} mins...")

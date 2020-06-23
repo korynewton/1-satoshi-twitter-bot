@@ -11,7 +11,9 @@ ACCESS_SECRET = os.environ["ACCESS_SECRET"]
 
 #Redis host
 REDIS_HOST = os.environ["REDIS_HOST"]
-r = redis.Redis(host=REDIS_HOST,port=6379, db=0, decode_responses=True)
+REDIS_PW = os.environ["REDIS_PW"]
+r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True, password=REDIS_PW, socket_keepalive=True, retry_on_timeout=True)
+
 
 
 #authenticate with Twitter

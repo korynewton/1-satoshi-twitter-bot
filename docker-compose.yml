@@ -15,15 +15,17 @@ services:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - ACCESS_SECRET=${ACCESS_SECRET}
       - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PW=${REDIS_PW}
+      - TZ=${TZ}
   redis:
     image: redis:latest
     restart: always
     ports:
       - 6379:6379
-    volumes:
-      - ./redis.config:/redis.conf
-      - redis_data:/data
-    command: ['redis-server', '/redis.conf']
+    environment:
+      - TZ=${TZ}
+      - REDIS_PW=${REDIS_PW}
+    command: redis-server --bind redis --requirepass ${REDIS_PW} --maxmemory 256mb --maxmemory-policy allkeys-lru --appendonly yes
   worker:
     depends_on:
       - redis
@@ -35,6 +37,8 @@ services:
     environment:
       - REDIS_HOST=${REDIS_HOST}
       - FIXER_KEY=${FIXER_KEY}
+      - REDIS_PW=${REDIS_PW}
+      - TZ=${TZ}
   stream-bot:
     depends_on:
       - redis
@@ -49,5 +53,5 @@ services:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - ACCESS_SECRET=${ACCESS_SECRET}
       - REDIS_HOST=${REDIS_HOST}
-volumes:
-  redis_data:
+      - REDIS_PW=${REDIS_PW}
+      - TZ=${TZ}

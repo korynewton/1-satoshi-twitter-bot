@@ -2,10 +2,11 @@ import os, redis, time, requests, json
 from datetime import datetime
 from emoji_dict import emoji_dict
 
-REDIS_HOST = os.environ["REDIS_HOST"]
 FIXER_KEY = os.environ["FIXER_KEY"]
 
-r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True)
+REDIS_HOST = os.environ["REDIS_HOST"]
+REDIS_PW = os.environ["REDIS_PW"]
+r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True, password=REDIS_PW, socket_keepalive=True, retry_on_timeout=True)
 
 def fetch_price_data():
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \

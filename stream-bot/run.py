@@ -78,106 +78,31 @@ class StdOutListener(tp.StreamListener):
         #  format numbers
         bitcoin = '{0:,}'.format(round(bitcoin))
 
-        if sats > 1:
-            sats = '{0:.2f}'.format(sats)
-        else:
-            sats = '{0:.5f}'.format(sats)
-
-        if hundred > 1:
-            hundred = '{0:.2f}'.format(hundred)
-        else:
-            hundred = '{0:.5f}'.format(hundred)
-
-        if thousand > 1:
-            thousand = '{0:,.2f}'.format(thousand)
-        else:
-            thousand = '{0:.5f}'.format(thousand)
-
-        if ten_thousand > 1:
-            ten_thousand = '{0:,.2f}'.format(ten_thousand)
-        else:
-            ten_thousand = '{0:.5f}'.format(ten_thousand)
-
-        if hundred_k > 1:
-            hundred_k = '{0:,.2f}'.format(hundred_k)
-        else:
-            hundred_k = '{0:.5f}'.format(hundred_k)
-
-        if million > 1:
-            if million > 1000:
-                million = '{:,d}'.format(round(million))
-            else:
-                million = '{0:.2f}'.format(million)
-        else:
-            million = '{0:.5f}'.format(million)
-
-        # satoshi equivalent to currency
-        if single_unit > 1:
-            single_unit = '{:,d}'.format(round(single_unit))
-        else:
-            single_unit = '{0:.2f}'.format(single_unit)
-
-        if ten_units > 100:
-            ten_units = '{:,}'.format(round(ten_units))
-        else:
-            ten_units = '{0:.2f}'.format(ten_units)
-
-        if hundred_units > 100:
-            hundred_units = '{:,}'.format(round(hundred_units))
-        else:
-            hundred_units = '{0:.2f}'.format(hundred_units)
-
-        if thousand_units > 100:
-            thousand_units = '{:,}'.format(round(thousand_units))
-        else:
-            thousand_units = '{0:.2f}'.format(thousand_units)
-
-        if five_hundred_units > 100:
-            five_hundred_units = '{:,}'.format(round(five_hundred_units))
-        else:
-            five_hundred_units = '{0:.2f}'.format(five_hundred_units)
-
-        if ten_thousand_units > 100:
-            ten_thousand_units = '{:,}'.format(round(ten_thousand_units))
-        else:
-            ten_thousand_units = '{0:.2f}'.format(ten_thousand_units)
-
-        if hundred_thousand_units > 100:
-            hundred_thousand_units = '{:,}'.format(
-                round(hundred_thousand_units))
-        else:
-            hundred_thousand_units = '{0:.2f}'.format(hundred_thousand_units)
-
-        if hundredths_unit > 1:
-            hundredths_unit = '{:,}'.format(round(hundredths_unit))
-        else:
-            hundredths_unit = '{0:.2f}'.format(hundredths_unit)
-
         larger_baseline = ['JPY', 'KRW', 'IRR']
         if curr in larger_baseline:
             text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
-                '\n' + f'   1 {curr} = {single_unit} sats' + \
-                '\n' + f'   1,000 {curr} = {thousand_units} sats' + \
-                '\n' + f'   10,000 {curr} = {ten_thousand_units} sats' + \
-                '\n' + f'   100,000 {curr} = {hundred_thousand_units} sats' + \
+                '\n' + f'  1 {curr} = {format_sats(single_unit)} sats' + \
+                '\n' + f'  1,000 {curr} = {format_sats(thousand_units)} sats' + \
+                '\n' + f'  10,000 {curr} = {format_sats(ten_thousand_units)} sats' + \
+                '\n' + f'  100,000 {curr} = {format_sats(hundred_thousand_units)} sats' + \
                 '\n' + '\n' + \
-                '\n' + f'   1 sat = {sats} {curr}' + \
-                '\n' + f'   100 sats = {hundred} {curr}' + \
-                '\n' + f'   1,000 sats = {thousand} {curr}' + \
-                '\n' + f'   1,000,000 sats = {million} {curr}' + \
+                '\n' + f'  1 sat = {format_currency(sats)} {curr}' + \
+                '\n' + f'  100 sats = {format_currency(hundred)} {curr}' + \
+                '\n' + f'  1,000 sats = {format_currency(thousand)} {curr}' + \
+                '\n' + f'  1,000,000 sats = {format_currency(million)} {curr}' + \
                 '\n' + '\n' + \
                 f'1 #bitcoin = {bitcoin} {curr} {emoji}'
         else:
             text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
-                '\n' + f'   .01 {curr} = {hundredths_unit} sats' + \
-                '\n' + f'   1 {curr} = {single_unit} sats' + \
-                '\n' + f'   100 {curr} = {hundred_units} sats' + \
-                '\n' + f'   1,000 {curr} = {thousand_units} sats' + \
+                '\n' + f'   .01 {curr} = {format_sats(hundredths_unit)} sats' + \
+                '\n' + f'   1 {curr} = {format_sats(single_unit)} sats' + \
+                '\n' + f'   100 {curr} = {format_sats(hundred_units)} sats' + \
+                '\n' + f'   1,000 {curr} = {format_sats(thousand_units)} sats' + \
                 '\n' + '\n' + \
-                '\n' + f'   1 sat = {sats} {curr}' + \
-                '\n' + f'   100 sats = {hundred} {curr}' + \
-                '\n' + f'   10,000 sats = {ten_thousand} {curr}' + \
-                '\n' + f'   1,000,000 sats = {million} {curr}' + \
+                '\n' + f'   1 sat = {format_currency(sats)} {curr}' + \
+                '\n' + f'   100 sats = {format_currency(hundred)} {curr}' + \
+                '\n' + f'   10,000 sats = {format_currency(ten_thousand)} {curr}' + \
+                '\n' + f'   1,000,000 sats = {format_currency(million)} {curr}' + \
                 '\n' + '\n' + \
                 f'   1 #bitcoin = {bitcoin} {curr} {emoji}'
 
@@ -188,7 +113,11 @@ class StdOutListener(tp.StreamListener):
             status=text, in_reply_to_status_id=reply_id, auto_populate_reply_metadata=True)
         print(f"Successful response to: {reply_id} at {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
     
+def format_currency(amount):
+    return '{0:,.2f}'.format(amount) if amount > 1 else '{0:.2g}'.format(amount)
 
+def format_sats(amount):
+    return '{:,}'.format(round(amount)) if amount > 1 else '{0:.2g}'.format(amount)
 
 if __name__ == "__main__":
     while True:

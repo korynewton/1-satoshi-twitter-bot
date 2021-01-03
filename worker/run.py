@@ -10,12 +10,18 @@ r = redis.Redis(host=REDIS_HOST, port=6379, db=0, decode_responses=True, passwor
 
 def fetch_price_data():
     fixer_url = 'http://data.fixer.io/api/latest?access_key=' + \
-        FIXER_KEY + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP, IRR'
+        FIXER_KEY + '&base=EUR&symbols=BTC,EUR, SDG, CUP, KPW, SYP'
     coinbase_url = 'https://api.coinbase.com/v2/exchange-rates?currency=BTC'
+    irr_url = "https://api.nobitex.ir/market/stats"
     try:
             # retrieve data from coinbase and fixer apis
         cb_json_data = requests.get(coinbase_url).json()['data']['rates']
         fixer_json_data = requests.get(fixer_url).json()['rates']
+        irr_json_data = requests.post(
+                                    url=irr_url,
+                                    json={"srcCurrency":"btc","dstCurrency":"rls"},
+                                    headers={"content-type": 'application/json'}
+                                    ).json()['stats']['btc-rls']
 
         rates_data = {}
         # from cb data, store data there are emojis for in rates_data, convert to sats
@@ -23,6 +29,10 @@ def fetch_price_data():
             if key in cb_json_data:
                 price_sats = float(cb_json_data[key])
                 rates_data[key] = str(price_sats / 100000000)
+
+        #IRR price
+        irr_price = float(irr_json_data['latest'])
+        rates_data['IRR'] = str(irr_price / 100000000)
 
         # for fixer data, get conversion based on EUR/BTC pair, multiply fixer currency with conversion rate
         EUR = fixer_json_data['EUR']

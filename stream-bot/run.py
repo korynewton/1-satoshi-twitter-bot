@@ -153,7 +153,7 @@ class StdOutListener(tp.StreamListener):
         else:
             hundredths_unit = '{0:.2f}'.format(hundredths_unit)
 
-        larger_baseline = ['JPY', 'INR', 'KRW']
+        larger_baseline = ['JPY', 'KRW', 'IRR']
         if curr in larger_baseline:
             text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
                 '\n' + f'   1 {curr} = {single_unit} sats' + \

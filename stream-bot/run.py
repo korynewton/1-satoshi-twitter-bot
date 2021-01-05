@@ -78,7 +78,7 @@ class StdOutListener(tp.StreamListener):
         #  format numbers
         bitcoin = '{0:,}'.format(round(bitcoin))
 
-        larger_baseline = ['JPY', 'KRW', 'IRR']
+        larger_baseline = ['JPY', 'KRW', 'IRR', 'VES']
         if curr in larger_baseline:
             text = f'{emoji} ${curr} to #satoshi conversions:' + '\n' + \
                 '\n' + f'  1 {curr} = {format_sats(single_unit)} sats' + \
